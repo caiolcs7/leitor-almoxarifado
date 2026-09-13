@@ -32,6 +32,24 @@ async function setup() {
   return createSession('Teste R01', 'fixed');
 }
 describe('durable sessions and scan state machine', () => {
+  it('restores legacy backup settings without bringing back the IT-only default', async () => {
+    const session = await setup();
+    await processScan(session.id, 'R01A1C02DP01', 'hid', settings);
+    await processScan(session.id, 'ITABC01', 'hid', settings);
+    const backup = await createBackup();
+    backup.settings.rules.productPatterns = ['^IT[A-Z0-9]{3,62}$'];
+    backup.settings.sound = false;
+    await importBackup(backup, true);
+    const restored = (await db.settings.get('main'))!;
+    expect(restored.sound).toBe(false);
+    expect(
+      await processScan(session.id, 'Ml12345', 'hid', restored),
+    ).toMatchObject({
+      kind: 'product',
+      record: { code: 'ML12345', address: 'R01A1C02DP01' },
+    });
+    expect(await db.records.count()).toBe(3);
+  });
   it('implements the complete required acceptance sequence', async () => {
     const s = await setup();
     for (const code of [

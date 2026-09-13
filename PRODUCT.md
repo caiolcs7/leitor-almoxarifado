@@ -36,7 +36,7 @@ User supplied specification with examples ITPFPHM510ESAI4, ITPRCSEM03AI4, ITARSR
 
 ## Open Decisions
 
-Initial assumption, pending optional clarification: product pattern starts IT, followed by alphanumerics; additional product families configured in settings. This intentionally rejects unknowns rather than guessing. No supplied product name; Leitor de Almoxarifado describes its function.
+Confirmed on 2026-09-13: products have varied prefixes, including IT, Ml, MPC, STC and MPL; all location labels start R. The default accepts alphanumeric product identifiers starting with any letter except R and keeps complete address-format validation. Product identifiers beginning R or containing only digits remain an open clarification and require explicit rules. No supplied product name; Leitor de Almoxarifado describes its function.
 
 ## Product Principles
 

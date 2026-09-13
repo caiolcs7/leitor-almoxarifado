@@ -64,7 +64,7 @@ Crie um levantamento, inicie a câmera e leia um endereço. Cada produto seguint
 
 Também há leitor físico (teclado com Enter/Tab), leitura de uma imagem por vez e entrada manual. Em Registros, use busca, filtros, revisão, edição, seleção e alteração de endereço em lote. `Ctrl+Z` desfaz, `Ctrl+F` abre a busca e `Ctrl+E` exporta; atalhos não interferem com campos de texto. Esc fecha diálogos.
 
-Configurações contém regras de produto/endereço, wrapper completo, preenchimento opcional B, som, vibração, câmera, tema e backup. Inicialmente são aceitos produtos `IT` com mais 3–62 caracteres alfanuméricos e os formatos de endereço fornecidos no pedido. Outros padrões precisam ser configurados; valores desconhecidos não são adivinhados.
+Configurações contém regras de produto/endereço, wrapper completo, preenchimento opcional B, som, vibração, câmera, tema e backup. O padrão aceita produtos alfanuméricos de 2–64 caracteres começando por letra, como IT, ML, MPC, STC, MPL e outras famílias. O prefixo R fica reservado aos endereços, que precisam corresponder ao formato completo configurado. Letras minúsculas viram maiúsculas sem trocar letras por outras. A atualização substitui automaticamente a antiga regra padrão limitada a IT e preserva regras personalizadas; backups antigos também recebem essa correção quando suas configurações são restauradas.
 
 Exporte um backup JSON regularmente. Restaurar adiciona cópias e só substitui configurações se essa opção for marcada. Dados são separados por navegador e origem do site. Limpar os dados do navegador pode removê-los. Exportar Excel não apaga o levantamento.
 

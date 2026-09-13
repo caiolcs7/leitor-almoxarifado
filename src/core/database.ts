@@ -1,4 +1,5 @@
 import Dexie, { type Table } from 'dexie';
+import { upgradeLegacySettings } from './settings';
 import {
   defaultSettings,
   type Session,
@@ -20,7 +21,13 @@ export class InventoryDatabase extends Dexie {
       settings: 'id',
       history: 'id, sessionId, [sessionId+timestamp]',
     });
-    // Future migrations go in version(2).stores(...).upgrade(...); never delete the database on updates.
+    this.version(2)
+      .stores({})
+      .upgrade(async (transaction) => {
+        const table = transaction.table<Settings, string>('settings');
+        const settings = await table.get('main');
+        if (settings) await table.put(upgradeLegacySettings(settings));
+      });
   }
 }
 export const db = new InventoryDatabase();

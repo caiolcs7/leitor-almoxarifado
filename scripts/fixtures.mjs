@@ -8,6 +8,10 @@ const examples = {
   product: 'ITPFPHM510ESAI4',
   product2: 'ITPRCSEM03AI4',
   product3: 'ITARSRM003AI4',
+  'product-ml': 'ML12345',
+  'product-mpc': 'MPCABC01',
+  'product-stc': 'STC003',
+  'product-mpl': 'MPL012',
   bombona: 'R14B77',
 };
 for (const [name, text] of Object.entries(examples)) {

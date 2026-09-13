@@ -43,7 +43,8 @@ export const defaultSettings: Settings = {
   theme: 'light',
   exportFormat: 'xlsx',
   rules: {
-    productPatterns: ['^IT[A-Z0-9]{3,62}$'],
+    // R is reserved for location labels in the default warehouse rules.
+    productPatterns: ['^[A-QS-Z][A-Z0-9]{1,63}$'],
     addressPatterns: [
       '^R[0-9]{2,3}A[0-9]{1,3}C[0-9]{1,3}DP[0-9]{1,3}$',
       '^R[0-9]{2,3}B[0-9]{1,3}$',

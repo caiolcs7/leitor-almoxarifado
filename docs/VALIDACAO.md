@@ -6,8 +6,8 @@ Execução local em 12–13/09/2026, Windows, Node.js 24.19.0, Chromium automati
 
 | Verificação            | Resultado                                                                |
 | ---------------------- | ------------------------------------------------------------------------ |
-| `npm run test`         | 63 testes aprovados em 5 arquivos                                        |
-| `npm run test:e2e`     | 7 cenários aprovados, 31,2 segundos                                      |
+| `npm run test`         | 85 testes aprovados em 6 arquivos                                        |
+| `npm run test:e2e`     | 8 cenários aprovados, aproximadamente 1,1 minuto                         |
 | `npm run lint`         | Aprovado, sem erros ou avisos                                            |
 | `npm run typecheck`    | Aprovado; também executado no build                                      |
 | `npm run build`        | Aprovado; manifest, service worker, worker e WASM gerados                |
@@ -31,6 +31,10 @@ O endereço ativo e todos os registros foram recuperados. Ainda offline, outra i
 O mesmo cenário verificou edição e exclusão offline, recarga, desfazer e restaurar. O teste espera a confirmação de salvamento antes de encerrar ou recarregar a página.
 
 ## Cobertura de leitura e dados
+
+A atualização de 13/09 ampliou os prefixos de produto. Novas imagens Data Matrix de ML, MPC, STC e MPL foram decodificadas de fato. O cenário de navegador leu essas imagens offline, adicionou outro prefixo por HID e um código `Ml` por entrada manual, rejeitou endereço R incompleto, recarregou e conferiu os seis pares no XLSX baixado. Códigos desses testes são exemplos sintéticos e não são adicionados aos levantamentos do usuário.
+
+Dois testes de migração abriram um banco v1 com dados existentes e verificaram atualização para v2, preservando registros, endereço ativo, par pendente, preferências e regras personalizadas. Um teste adicional restaurou configurações de backup antigo e confirmou que a restrição a IT não voltou.
 
 - Data Matrix normal, rotacionado e invertido, incluindo os formatos de endereço complexo e bombona; QR Code e Code 128 também decodificados em testes próprios.
 - Imagem sem código rejeitada; controles, espaços, Unicode, identificadores AIM, wrappers completos e ambiguidade exercitados no parser.
@@ -67,7 +71,7 @@ Evidências locais são geradas em `artifacts/` (ignorado pelo Git), incluindo o
 - Não foram testados telefones físicos Android/iPhone, câmera real com etiquetas do almoxarifado, scanner USB/Bluetooth físico, lanterna, zoom, foco, vibração ou instalação PWA em celular. O navegador e o hardware determinam o suporte dessas APIs.
 - Chrome/Edge/Safari físicos não foram homologados individualmente. Os testes automatizados usaram Chromium; a responsividade foi emulada.
 - Não houve teste de carga prolongado com dezenas de milhares de registros ou medição de bateria em turno de trabalho. A leitura real de etiquetas danificadas, refletivas ou distantes precisa ser conferida com as etiquetas disponíveis no local.
-- Produtos inicialmente seguem o prefixo `IT` dos exemplos; outros padrões devem ser configurados e validados antes do uso. Nenhum código parcial é completado automaticamente.
+- Produtos aceitam diferentes prefixos alfanuméricos começando por letra; R fica reservado aos endereços na regra padrão. Produtos começando R ou compostos apenas por números precisam de uma regra explícita para evitar confusão com posições e wrappers numéricos. Nenhum código parcial é completado automaticamente.
 - IndexedDB mantém dados por origem e navegador, mas não é backup externo. Limpar os dados do navegador, trocar origem ou perder o dispositivo pode impedir a recuperação. Há exportação e restauração JSON para esse fim.
 - Importação XLSX e sincronização em nuvem não foram implementadas; a primeira era opcional e a segunda ficou explicitamente fora do escopo.
 

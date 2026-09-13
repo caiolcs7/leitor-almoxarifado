@@ -7,6 +7,7 @@ import {
   settingsSchema,
 } from '../core/models';
 import { validateRules } from '../core/parser';
+import { upgradeLegacySettings } from '../core/settings';
 
 export const backupSchema = z.object({
   format: z.literal('almoxarifado-backup'),
@@ -102,7 +103,8 @@ export async function importBackup(input: unknown, restoreSettings: boolean) {
           sessionId: mapping.get(h.sessionId)!,
         })),
       );
-      if (restoreSettings) await db.settings.put(backup.settings);
+      if (restoreSettings)
+        await db.settings.put(upgradeLegacySettings(backup.settings));
     },
   );
   return backup.sessions.length;

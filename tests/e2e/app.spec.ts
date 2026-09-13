@@ -63,6 +63,60 @@ async function noOverflow(page: Page) {
   ).toBe(true);
 }
 
+test('multiple product prefixes work through Data Matrix, HID, manual entry and XLSX offline', async ({
+  page,
+  context,
+}) => {
+  await create(page, 'Novos prefixos');
+  await readyOffline(page);
+  await context.setOffline(true);
+  await hid(page, 'R01A1C02DP01');
+  const families = ['product-ml', 'product-mpc', 'product-stc', 'product-mpl'];
+  for (const [index, name] of families.entries()) {
+    await imageScan(page, name);
+    await expect(page.locator('.session-heading p')).toContainText(
+      `${index + 1} registros`,
+    );
+  }
+  await hid(page, 'R01A1C04DP03');
+  await hid(page, 'zx123');
+  await expect(page.locator('.session-heading p')).toContainText('5 registros');
+  await hid(page, 'R01A1C03DP');
+  await expect(page.locator('.scan-feedback')).toContainText(
+    'Código desconhecido',
+  );
+  await expect(page.locator('.address-value')).toHaveText('R01A1C04DP03');
+  await expect(page.locator('.session-heading p')).toContainText('5 registros');
+  await page
+    .getByRole('button', { name: 'Entrada manual', exact: true })
+    .click();
+  await page.getByLabel('Código do Produto', { exact: true }).fill('Ml999');
+  await page
+    .getByRole('button', { name: 'Adicionar registro', exact: true })
+    .click();
+  await expect(page.locator('.session-heading p')).toContainText('6 registros');
+  await page.reload();
+  await expect(page.locator('.session-heading p')).toContainText('6 registros');
+  const filename = await exportXlsx(page);
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.readFile(filename);
+  const sheet = workbook.getWorksheet('Todos os registros')!;
+  expect(sheet.columnCount).toBe(2);
+  expect(
+    [6, 7, 8, 9, 10, 11].map((row) => [
+      sheet.getCell(`A${row}`).value,
+      sheet.getCell(`B${row}`).value,
+    ]),
+  ).toEqual([
+    ['ML12345', 'R01A1C02DP01'],
+    ['MPCABC01', 'R01A1C02DP01'],
+    ['STC003', 'R01A1C02DP01'],
+    ['MPL012', 'R01A1C02DP01'],
+    ['ZX123', 'R01A1C04DP03'],
+    ['ML999', 'R01A1C04DP03'],
+  ]);
+});
+
 test('acceptance: Data Matrix images, browser restart, offline WASM and actual XLSX download', async () => {
   // Chromium on Windows fails to register its service worker with very long profile paths.
   // Use a short, isolated OS temporary profile, preserving it across the real browser restart.

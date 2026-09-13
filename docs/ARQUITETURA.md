@@ -6,13 +6,13 @@ Aplicação React 19 + TypeScript strict + Vite 8. A interface é dividida em se
 
 Todas as entradas passam pelo mesmo parser: Unicode NFKC → remoção de espaços, controles e invisíveis → identificador AIM conhecido → maiúsculas → wrapper configurado sem ambiguidade → classificação → regra opcional de endereço → associação.
 
-As regras iniciais foram derivadas apenas dos exemplos fornecidos. Não se classifica qualquer texto iniciado em R como endereço. Correspondência simultânea a produto e endereço é recusada. Prefixos 251 e sufixos 371 não são removidos por padrão; exigem uma configuração de wrapper completo, um payload válido e um original não válido. Não há inferência de caracteres ausentes.
+Após a confirmação de múltiplas famílias de produto, o padrão aceita códigos alfanuméricos de 2–64 caracteres começando por letra, sem lista fixa de prefixos. R fica reservado aos endereços na configuração padrão, mas só formatos completos de posição são aceitos. Um endereço R incompleto não vira produto. Correspondência simultânea a regras personalizadas de produto e endereço é recusada. Prefixos 251 e sufixos 371 não são removidos por padrão; exigem uma configuração de wrapper completo, um payload válido e um original não válido. Não há inferência de caracteres ausentes.
 
 O modo fixo guarda `activeAddress`. Ler um endereço só altera esse estado. Ler um produto sem endereço retorna erro sem registro. Os modos pareados guardam um primeiro elemento em `pending`, exigem a ordem escolhida e limpam o par apenas após registro ou cancelamento. Outro elemento do mesmo tipo não substitui silenciosamente o primeiro.
 
 ## Persistência e concorrência
 
-Dexie abstrai IndexedDB, com schema versão 1 e tabelas `sessions`, `records`, `settings` e `history`. Os índices incluem sessão/ordem, sessão/código/endereço e sessão/horário. Cada leitura executa transação atômica envolvendo registro, contador, estado do par/endereço e histórico. A sequência monotônica não é reutilizada após desfazer. Alterações não dependem de servidor.
+Dexie abstrai IndexedDB, com schema versão 2 e tabelas `sessions`, `records`, `settings` e `history`. A migração de v1 para v2 amplia somente a antiga regra padrão de produtos IT; sessões, registros, preferências e regras personalizadas são preservados. A restauração das configurações de um backup antigo usa a mesma correção. Os índices incluem sessão/ordem, sessão/código/endereço e sessão/horário. Cada leitura executa transação atômica envolvendo registro, contador, estado do par/endereço e histórico. A sequência monotônica não é reutilizada após desfazer. Alterações não dependem de servidor.
 
 Backup JSON validado com Zod verifica estrutura, versão, referências, identificadores repetidos e regras. A restauração é transacional e usa novos IDs; quantidades e próxima ordem são recalculadas. Câmeras e IDs de dispositivo importados podem precisar ser escolhidos novamente em outro aparelho.
 

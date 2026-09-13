@@ -17,6 +17,38 @@ describe('central parser', () => {
         normalized: value,
       }),
   );
+  it.each([
+    'ML12345',
+    'MI12345',
+    'MPCABC01',
+    'STC003',
+    'MPL012',
+    'ZX123',
+    'AB',
+  ])('accepts other product families without an IT whitelist: %s', (value) =>
+    expect(parseScan(value, rules)).toMatchObject({
+      valid: true,
+      type: 'product',
+      normalized: value,
+    }),
+  );
+  it('normalizes Ml to ML without confusing the letter L with I', () => {
+    expect(parseScan(' Ml12345\r\n', rules).normalized).toBe('ML12345');
+    expect(parseScan('Mi12345', rules).normalized).toBe('MI12345');
+  });
+  it.each(['R01A1C02DP01', 'R01A1C04DP03', 'R01A1C03DP03'])(
+    'keeps each R address classified as a location: %s',
+    (value) =>
+      expect(parseScan(value, rules)).toMatchObject({
+        valid: true,
+        type: 'address',
+        normalized: value,
+      }),
+  );
+  it.each(['R01A1C02DP', 'RXYZ123', 'R', 'R12345'])(
+    'does not treat an incomplete or unknown R address as a product: %s',
+    (value) => expect(parseScan(value, rules).valid).toBe(false),
+  );
   it.each(['R01A1C03DP02', 'R14B77', 'R14B077'])(
     'preserves address %s',
     (value) =>

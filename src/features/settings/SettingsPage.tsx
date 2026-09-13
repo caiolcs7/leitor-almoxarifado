@@ -249,6 +249,11 @@ export function SettingsPage({ settings }: { settings: Settings }) {
                 setForm({ ...form, rules: { ...form.rules, padB: value } })
               }
             />
+            <p className="helper">
+              Produtos aceitam prefixos como IT, ML, MPC, STC, MPL e outros. Na
+              regra padrão, R fica reservado aos endereços, que precisam
+              corresponder ao formato completo da posição.
+            </p>
             <details className="advanced">
               <summary>Padrões e normalização avançada</summary>
               <p className="helper">
