@@ -46,7 +46,7 @@ Os testes de navegador construíram e acessaram a aplicação em `/teste-subpast
 
 Uma nova versão real do service worker foi disponibilizada durante o teste. O aplicativo mostrou o aviso, aguardou o clique em Atualizar, ativou o worker e recarregou a mesma sessão com endereço e registro preservados. Foi corrigida uma falha em que a interface permanecia em “Atualizando”; a ativação agora aguarda `controllerchange` e tem tratamento de demora.
 
-O workflow de GitHub Pages está preparado, mas não foi executado em um repositório remoto nesta entrega. A compatibilidade com subdiretório foi validada localmente; domínio público e solicitação de câmera em HTTPS publicado ainda dependem da publicação.
+Na validação inicial, a compatibilidade com subdiretório foi conferida localmente. Em 13/09/2026, o aplicativo foi publicado em [GitHub Pages](https://caiolcs7.github.io/leitor-almoxarifado/). O [workflow de publicação](https://github.com/caiolcs7/leitor-almoxarifado/actions/runs/34761497545) concluiu com sucesso instalação, lint, testes, build, testes de navegador e deploy em Ubuntu. O site público abriu por HTTPS sem erros JavaScript e exibiu “Pronto para uso offline”. O teste de câmera com aparelhos físicos no endereço publicado permanece pendente.
 
 ## Interface
 

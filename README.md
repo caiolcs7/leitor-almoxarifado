@@ -2,6 +2,8 @@
 
 PWA local para ler etiquetas Data Matrix, associar produtos a endereços e exportar relatórios Excel. Sem backend, login, serviços de análise ou envio de imagens.
 
+**Aplicativo publicado:** [Abrir Leitor de Almoxarifado](https://caiolcs7.github.io/leitor-almoxarifado/).
+
 ## Instalar e executar
 
 Requer Node.js 22.12 ou superior (Node 24 recomendado).
