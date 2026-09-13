@@ -1,0 +1,13 @@
+node_modules/
+dist/
+dist-test/
+test-results/
+playwright-report/
+*.log
+.env*
+.impeccable/review/
+.impeccable/mocks/
+.impeccable/cache/
+.impeccable/tmp/
+artifacts/
+.claude/

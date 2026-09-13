@@ -1,0 +1,687 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-13T02:54:22.701Z",
+  "title": "Design System: Leitor de Almoxarifado",
+  "extensions": {
+    "colorMeta": {
+      "surface": {
+        "role": "neutral",
+        "displayName": "Mineral de fundo",
+        "tonalRamp": [
+          "oklch(15.00% 0.00249 165.08)",
+          "oklch(26.43% 0.00249 165.08)",
+          "oklch(37.86% 0.00249 165.08)",
+          "oklch(49.29% 0.00249 165.08)",
+          "oklch(60.71% 0.00249 165.08)",
+          "oklch(72.14% 0.00249 165.08)",
+          "oklch(83.57% 0.00249 165.08)",
+          "oklch(95.00% 0.00249 165.08)"
+        ]
+      },
+      "surface-elevated": {
+        "role": "neutral",
+        "displayName": "Branco de trabalho",
+        "tonalRamp": [
+          "oklch(15.00% 0.00000 89.88)",
+          "oklch(26.43% 0.00000 89.88)",
+          "oklch(37.86% 0.00000 89.88)",
+          "oklch(49.29% 0.00000 89.88)",
+          "oklch(60.71% 0.00000 89.88)",
+          "oklch(72.14% 0.00000 89.88)",
+          "oklch(83.57% 0.00000 89.88)",
+          "oklch(95.00% 0.00000 89.88)"
+        ]
+      },
+      "surface-muted": {
+        "role": "neutral",
+        "displayName": "Mineral de apoio",
+        "tonalRamp": [
+          "oklch(15.00% 0.00501 165.01)",
+          "oklch(26.43% 0.00501 165.01)",
+          "oklch(37.86% 0.00501 165.01)",
+          "oklch(49.29% 0.00501 165.01)",
+          "oklch(60.71% 0.00501 165.01)",
+          "oklch(72.14% 0.00501 165.01)",
+          "oklch(83.57% 0.00501 165.01)",
+          "oklch(95.00% 0.00501 165.01)"
+        ]
+      },
+      "text-primary": {
+        "role": "neutral",
+        "displayName": "Tinta verde-escura",
+        "tonalRamp": [
+          "oklch(15.00% 0.02636 176.18)",
+          "oklch(26.43% 0.02636 176.18)",
+          "oklch(37.86% 0.02636 176.18)",
+          "oklch(49.29% 0.02636 176.18)",
+          "oklch(60.71% 0.02636 176.18)",
+          "oklch(72.14% 0.02636 176.18)",
+          "oklch(83.57% 0.02636 176.18)",
+          "oklch(95.00% 0.02636 176.18)"
+        ]
+      },
+      "text-secondary": {
+        "role": "neutral",
+        "displayName": "Tinta secundária",
+        "tonalRamp": [
+          "oklch(15.00% 0.02497 162.32)",
+          "oklch(26.43% 0.02497 162.32)",
+          "oklch(37.86% 0.02497 162.32)",
+          "oklch(49.29% 0.02497 162.32)",
+          "oklch(60.71% 0.02497 162.32)",
+          "oklch(72.14% 0.02497 162.32)",
+          "oklch(83.57% 0.02497 162.32)",
+          "oklch(95.00% 0.02497 162.32)"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Linha mineral",
+        "tonalRamp": [
+          "oklch(15.00% 0.01257 156.98)",
+          "oklch(26.43% 0.01257 156.98)",
+          "oklch(37.86% 0.01257 156.98)",
+          "oklch(49.29% 0.01257 156.98)",
+          "oklch(60.71% 0.01257 156.98)",
+          "oklch(72.14% 0.01257 156.98)",
+          "oklch(83.57% 0.01257 156.98)",
+          "oklch(95.00% 0.01257 156.98)"
+        ]
+      },
+      "primary": {
+        "role": "primary",
+        "displayName": "Verde operacional",
+        "tonalRamp": [
+          "oklch(15.00% 0.07759 179.30)",
+          "oklch(26.43% 0.07759 179.30)",
+          "oklch(37.86% 0.07759 179.30)",
+          "oklch(49.29% 0.07759 179.30)",
+          "oklch(60.71% 0.07759 179.30)",
+          "oklch(72.14% 0.07759 179.30)",
+          "oklch(83.57% 0.07759 179.30)",
+          "oklch(95.00% 0.07759 179.30)"
+        ]
+      },
+      "primary-hover": {
+        "role": "primary",
+        "displayName": "Verde profundo",
+        "tonalRamp": [
+          "oklch(15.00% 0.06787 177.78)",
+          "oklch(26.43% 0.06787 177.78)",
+          "oklch(37.86% 0.06787 177.78)",
+          "oklch(49.29% 0.06787 177.78)",
+          "oklch(60.71% 0.06787 177.78)",
+          "oklch(72.14% 0.06787 177.78)",
+          "oklch(83.57% 0.06787 177.78)",
+          "oklch(95.00% 0.06787 177.78)"
+        ]
+      },
+      "primary-soft": {
+        "role": "primary",
+        "displayName": "Verde de contexto",
+        "tonalRamp": [
+          "oklch(15.00% 0.01660 162.74)",
+          "oklch(26.43% 0.01660 162.74)",
+          "oklch(37.86% 0.01660 162.74)",
+          "oklch(49.29% 0.01660 162.74)",
+          "oklch(60.71% 0.01660 162.74)",
+          "oklch(72.14% 0.01660 162.74)",
+          "oklch(83.57% 0.01660 162.74)",
+          "oklch(95.00% 0.01660 162.74)"
+        ]
+      },
+      "success": {
+        "role": "success",
+        "displayName": "Verde de aceite",
+        "tonalRamp": [
+          "oklch(15.00% 0.09125 161.28)",
+          "oklch(26.43% 0.09125 161.28)",
+          "oklch(37.86% 0.09125 161.28)",
+          "oklch(49.29% 0.09125 161.28)",
+          "oklch(60.71% 0.09125 161.28)",
+          "oklch(72.14% 0.09125 161.28)",
+          "oklch(83.57% 0.09125 161.28)",
+          "oklch(95.00% 0.09125 161.28)"
+        ]
+      },
+      "warning": {
+        "role": "warning",
+        "displayName": "Âmbar de revisão",
+        "tonalRamp": [
+          "oklch(15.00% 0.10302 68.59)",
+          "oklch(26.43% 0.10302 68.59)",
+          "oklch(37.86% 0.10302 68.59)",
+          "oklch(49.29% 0.10302 68.59)",
+          "oklch(60.71% 0.10302 68.59)",
+          "oklch(72.14% 0.10302 68.59)",
+          "oklch(83.57% 0.10302 68.59)",
+          "oklch(95.00% 0.10302 68.59)"
+        ]
+      },
+      "warning-soft": {
+        "role": "warning",
+        "displayName": "Âmbar de apoio",
+        "tonalRamp": [
+          "oklch(15.00% 0.03359 86.31)",
+          "oklch(26.43% 0.03359 86.31)",
+          "oklch(37.86% 0.03359 86.31)",
+          "oklch(49.29% 0.03359 86.31)",
+          "oklch(60.71% 0.03359 86.31)",
+          "oklch(72.14% 0.03359 86.31)",
+          "oklch(83.57% 0.03359 86.31)",
+          "oklch(95.00% 0.03359 86.31)"
+        ]
+      },
+      "danger": {
+        "role": "danger",
+        "displayName": "Vermelho de falha",
+        "tonalRamp": [
+          "oklch(15.00% 0.16370 24.82)",
+          "oklch(26.43% 0.16370 24.82)",
+          "oklch(37.86% 0.16370 24.82)",
+          "oklch(49.29% 0.16370 24.82)",
+          "oklch(60.71% 0.16370 24.82)",
+          "oklch(72.14% 0.16370 24.82)",
+          "oklch(83.57% 0.16370 24.82)",
+          "oklch(95.00% 0.16370 24.82)"
+        ]
+      },
+      "danger-soft": {
+        "role": "danger",
+        "displayName": "Vermelho de apoio",
+        "tonalRamp": [
+          "oklch(15.00% 0.01650 26.65)",
+          "oklch(26.43% 0.01650 26.65)",
+          "oklch(37.86% 0.01650 26.65)",
+          "oklch(49.29% 0.01650 26.65)",
+          "oklch(60.71% 0.01650 26.65)",
+          "oklch(72.14% 0.01650 26.65)",
+          "oklch(83.57% 0.01650 26.65)",
+          "oklch(95.00% 0.01650 26.65)"
+        ]
+      },
+      "camera": {
+        "role": "neutral",
+        "displayName": "Vidro da câmera",
+        "tonalRamp": [
+          "oklch(15.00% 0.02627 187.67)",
+          "oklch(26.43% 0.02627 187.67)",
+          "oklch(37.86% 0.02627 187.67)",
+          "oklch(49.29% 0.02627 187.67)",
+          "oklch(60.71% 0.02627 187.67)",
+          "oklch(72.14% 0.02627 187.67)",
+          "oklch(83.57% 0.02627 187.67)",
+          "oklch(95.00% 0.02627 187.67)"
+        ]
+      },
+      "surface-dark": {
+        "role": "neutral",
+        "displayName": "Mineral de fundo · tema escuro",
+        "tonalRamp": [
+          "oklch(15.00% 0.01865 171.95)",
+          "oklch(26.43% 0.01865 171.95)",
+          "oklch(37.86% 0.01865 171.95)",
+          "oklch(49.29% 0.01865 171.95)",
+          "oklch(60.71% 0.01865 171.95)",
+          "oklch(72.14% 0.01865 171.95)",
+          "oklch(83.57% 0.01865 171.95)",
+          "oklch(95.00% 0.01865 171.95)"
+        ]
+      },
+      "surface-elevated-dark": {
+        "role": "neutral",
+        "displayName": "Branco de trabalho · tema escuro",
+        "tonalRamp": [
+          "oklch(15.00% 0.02317 167.91)",
+          "oklch(26.43% 0.02317 167.91)",
+          "oklch(37.86% 0.02317 167.91)",
+          "oklch(49.29% 0.02317 167.91)",
+          "oklch(60.71% 0.02317 167.91)",
+          "oklch(72.14% 0.02317 167.91)",
+          "oklch(83.57% 0.02317 167.91)",
+          "oklch(95.00% 0.02317 167.91)"
+        ]
+      },
+      "surface-muted-dark": {
+        "role": "neutral",
+        "displayName": "Mineral de apoio · tema escuro",
+        "tonalRamp": [
+          "oklch(15.00% 0.02847 162.52)",
+          "oklch(26.43% 0.02847 162.52)",
+          "oklch(37.86% 0.02847 162.52)",
+          "oklch(49.29% 0.02847 162.52)",
+          "oklch(60.71% 0.02847 162.52)",
+          "oklch(72.14% 0.02847 162.52)",
+          "oklch(83.57% 0.02847 162.52)",
+          "oklch(95.00% 0.02847 162.52)"
+        ]
+      },
+      "text-primary-dark": {
+        "role": "neutral",
+        "displayName": "Tinta verde-escura · tema escuro",
+        "tonalRamp": [
+          "oklch(15.00% 0.01159 153.67)",
+          "oklch(26.43% 0.01159 153.67)",
+          "oklch(37.86% 0.01159 153.67)",
+          "oklch(49.29% 0.01159 153.67)",
+          "oklch(60.71% 0.01159 153.67)",
+          "oklch(72.14% 0.01159 153.67)",
+          "oklch(83.57% 0.01159 153.67)",
+          "oklch(95.00% 0.01159 153.67)"
+        ]
+      },
+      "text-secondary-dark": {
+        "role": "neutral",
+        "displayName": "Tinta secundária · tema escuro",
+        "tonalRamp": [
+          "oklch(15.00% 0.02653 158.07)",
+          "oklch(26.43% 0.02653 158.07)",
+          "oklch(37.86% 0.02653 158.07)",
+          "oklch(49.29% 0.02653 158.07)",
+          "oklch(60.71% 0.02653 158.07)",
+          "oklch(72.14% 0.02653 158.07)",
+          "oklch(83.57% 0.02653 158.07)",
+          "oklch(95.00% 0.02653 158.07)"
+        ]
+      },
+      "border-dark": {
+        "role": "neutral",
+        "displayName": "Linha mineral · tema escuro",
+        "tonalRamp": [
+          "oklch(15.00% 0.03206 158.26)",
+          "oklch(26.43% 0.03206 158.26)",
+          "oklch(37.86% 0.03206 158.26)",
+          "oklch(49.29% 0.03206 158.26)",
+          "oklch(60.71% 0.03206 158.26)",
+          "oklch(72.14% 0.03206 158.26)",
+          "oklch(83.57% 0.03206 158.26)",
+          "oklch(95.00% 0.03206 158.26)"
+        ]
+      },
+      "primary-dark": {
+        "role": "primary",
+        "displayName": "Verde operacional · tema escuro",
+        "tonalRamp": [
+          "oklch(15.00% 0.09223 171.39)",
+          "oklch(26.43% 0.09223 171.39)",
+          "oklch(37.86% 0.09223 171.39)",
+          "oklch(49.29% 0.09223 171.39)",
+          "oklch(60.71% 0.09223 171.39)",
+          "oklch(72.14% 0.09223 171.39)",
+          "oklch(83.57% 0.09223 171.39)",
+          "oklch(95.00% 0.09223 171.39)"
+        ]
+      },
+      "primary-hover-dark": {
+        "role": "primary",
+        "displayName": "Verde profundo · tema escuro",
+        "tonalRamp": [
+          "oklch(15.00% 0.07424 170.78)",
+          "oklch(26.43% 0.07424 170.78)",
+          "oklch(37.86% 0.07424 170.78)",
+          "oklch(49.29% 0.07424 170.78)",
+          "oklch(60.71% 0.07424 170.78)",
+          "oklch(72.14% 0.07424 170.78)",
+          "oklch(83.57% 0.07424 170.78)",
+          "oklch(95.00% 0.07424 170.78)"
+        ]
+      },
+      "primary-soft-dark": {
+        "role": "primary",
+        "displayName": "Verde de contexto · tema escuro",
+        "tonalRamp": [
+          "oklch(15.00% 0.04646 162.56)",
+          "oklch(26.43% 0.04646 162.56)",
+          "oklch(37.86% 0.04646 162.56)",
+          "oklch(49.29% 0.04646 162.56)",
+          "oklch(60.71% 0.04646 162.56)",
+          "oklch(72.14% 0.04646 162.56)",
+          "oklch(83.57% 0.04646 162.56)",
+          "oklch(95.00% 0.04646 162.56)"
+        ]
+      },
+      "success-dark": {
+        "role": "success",
+        "displayName": "Verde de aceite · tema escuro",
+        "tonalRamp": [
+          "oklch(15.00% 0.10475 157.98)",
+          "oklch(26.43% 0.10475 157.98)",
+          "oklch(37.86% 0.10475 157.98)",
+          "oklch(49.29% 0.10475 157.98)",
+          "oklch(60.71% 0.10475 157.98)",
+          "oklch(72.14% 0.10475 157.98)",
+          "oklch(83.57% 0.10475 157.98)",
+          "oklch(95.00% 0.10475 157.98)"
+        ]
+      },
+      "warning-dark": {
+        "role": "warning",
+        "displayName": "Âmbar de revisão · tema escuro",
+        "tonalRamp": [
+          "oklch(15.00% 0.09843 78.36)",
+          "oklch(26.43% 0.09843 78.36)",
+          "oklch(37.86% 0.09843 78.36)",
+          "oklch(49.29% 0.09843 78.36)",
+          "oklch(60.71% 0.09843 78.36)",
+          "oklch(72.14% 0.09843 78.36)",
+          "oklch(83.57% 0.09843 78.36)",
+          "oklch(95.00% 0.09843 78.36)"
+        ]
+      },
+      "warning-soft-dark": {
+        "role": "warning",
+        "displayName": "Âmbar de apoio · tema escuro",
+        "tonalRamp": [
+          "oklch(15.00% 0.03458 75.20)",
+          "oklch(26.43% 0.03458 75.20)",
+          "oklch(37.86% 0.03458 75.20)",
+          "oklch(49.29% 0.03458 75.20)",
+          "oklch(60.71% 0.03458 75.20)",
+          "oklch(72.14% 0.03458 75.20)",
+          "oklch(83.57% 0.03458 75.20)",
+          "oklch(95.00% 0.03458 75.20)"
+        ]
+      },
+      "danger-dark": {
+        "role": "danger",
+        "displayName": "Vermelho de falha · tema escuro",
+        "tonalRamp": [
+          "oklch(15.00% 0.10127 23.95)",
+          "oklch(26.43% 0.10127 23.95)",
+          "oklch(37.86% 0.10127 23.95)",
+          "oklch(49.29% 0.10127 23.95)",
+          "oklch(60.71% 0.10127 23.95)",
+          "oklch(72.14% 0.10127 23.95)",
+          "oklch(83.57% 0.10127 23.95)",
+          "oklch(95.00% 0.10127 23.95)"
+        ]
+      },
+      "danger-soft-dark": {
+        "role": "danger",
+        "displayName": "Vermelho de apoio · tema escuro",
+        "tonalRamp": [
+          "oklch(15.00% 0.03577 19.21)",
+          "oklch(26.43% 0.03577 19.21)",
+          "oklch(37.86% 0.03577 19.21)",
+          "oklch(49.29% 0.03577 19.21)",
+          "oklch(60.71% 0.03577 19.21)",
+          "oklch(72.14% 0.03577 19.21)",
+          "oklch(83.57% 0.03577 19.21)",
+          "oklch(95.00% 0.03577 19.21)"
+        ]
+      },
+      "camera-dark": {
+        "role": "neutral",
+        "displayName": "Vidro da câmera · tema escuro",
+        "tonalRamp": [
+          "oklch(15.00% 0.01687 167.73)",
+          "oklch(26.43% 0.01687 167.73)",
+          "oklch(37.86% 0.01687 167.73)",
+          "oklch(49.29% 0.01687 167.73)",
+          "oklch(60.71% 0.01687 167.73)",
+          "oklch(72.14% 0.01687 167.73)",
+          "oklch(83.57% 0.01687 167.73)",
+          "oklch(95.00% 0.01687 167.73)"
+        ]
+      },
+      "on-primary-dark": {
+        "role": "primary",
+        "displayName": "Texto sobre verde claro · tema escuro",
+        "tonalRamp": [
+          "oklch(15.00% 0.03777 163.36)",
+          "oklch(26.43% 0.03777 163.36)",
+          "oklch(37.86% 0.03777 163.36)",
+          "oklch(49.29% 0.03777 163.36)",
+          "oklch(60.71% 0.03777 163.36)",
+          "oklch(72.14% 0.03777 163.36)",
+          "oklch(83.57% 0.03777 163.36)",
+          "oklch(95.00% 0.03777 163.36)"
+        ]
+      },
+      "on-danger-dark": {
+        "role": "danger",
+        "displayName": "Texto sobre vermelho claro · tema escuro",
+        "tonalRamp": [
+          "oklch(15.00% 0.05438 25.83)",
+          "oklch(26.43% 0.05438 25.83)",
+          "oklch(37.86% 0.05438 25.83)",
+          "oklch(49.29% 0.05438 25.83)",
+          "oklch(60.71% 0.05438 25.83)",
+          "oklch(72.14% 0.05438 25.83)",
+          "oklch(83.57% 0.05438 25.83)",
+          "oklch(95.00% 0.05438 25.83)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "headline",
+        "purpose": "Título principal de página."
+      },
+      "title": {
+        "displayName": "title",
+        "purpose": "Títulos de seção."
+      },
+      "body": {
+        "displayName": "body",
+        "purpose": "Texto padrão da interface."
+      },
+      "paragraph": {
+        "displayName": "paragraph",
+        "purpose": "Explicações com leitura mais aberta."
+      },
+      "label": {
+        "displayName": "label",
+        "purpose": "Rótulos visíveis de campos."
+      },
+      "button": {
+        "displayName": "button",
+        "purpose": "Ações em caixa natural."
+      },
+      "helper": {
+        "displayName": "helper",
+        "purpose": "Texto de apoio."
+      },
+      "address-code": {
+        "displayName": "address-code",
+        "purpose": "Identificador de maior hierarquia na coleta."
+      },
+      "address-code-mobile": {
+        "displayName": "address-code-mobile",
+        "purpose": "Tamanho responsivo do endereço até 767px."
+      },
+      "record-code": {
+        "displayName": "record-code",
+        "purpose": "Códigos nas células de registro."
+      },
+      "recent-code": {
+        "displayName": "recent-code",
+        "purpose": "Códigos na lista de leituras recentes."
+      }
+    },
+    "shadows": [
+      {
+        "name": "shadow",
+        "value": "0 12px 36px #122d251f",
+        "purpose": "Sombra compartilhada por diálogo e aviso flutuante."
+      }
+    ],
+    "motion": [
+      {
+        "name": "transition",
+        "value": "150ms ease-out",
+        "purpose": "Mudanças de fundo, borda e texto dos botões e movimento do controle de alternância."
+      },
+      {
+        "name": "scan-ack",
+        "value": "500ms ease-out",
+        "purpose": "Reconhecimento de leitura: fundo primary-soft até transparente."
+      },
+      {
+        "name": "rotate",
+        "value": "1s linear infinite",
+        "purpose": "Indicador de carregamento em rotação."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation: none !important; transition: none !important; scroll-behavior: auto !important",
+        "purpose": "Aplicado a elementos e pseudoelementos quando prefers-reduced-motion: reduce."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wide-desktop-min",
+        "value": "1600px"
+      },
+      {
+        "name": "compact-desktop-max",
+        "value": "1100px"
+      },
+      {
+        "name": "mobile-max",
+        "value": "767px"
+      },
+      {
+        "name": "narrow-mobile-max",
+        "value": "359px"
+      }
+    ],
+    "backdrop": {
+      "selector": ".modal::backdrop",
+      "value": "#0b231db3"
+    },
+    "focus": {
+      "value": "3px solid var(--primary)",
+      "offset": "3px",
+      "inputOffset": "2px"
+    },
+    "tonalRampPolicy": "Rampas OKLCH sintetizadas exclusivamente para exploração no painel; não são tokens usados pela aplicação. Cores normativas permanecem no frontmatter de DESIGN.md.",
+    "source": "src/styles/app.css; src/components/ui.tsx; src/app/App.tsx; src/features/sessions/SessionPage.tsx; src/features/records/RecordsView.tsx",
+    "iconSource": "Lucide React 1.45.0, licença ISC: ClipboardList, Settings2 e X. SVGs inline copiados dos módulos locais."
+  },
+  "components": [
+    {
+      "name": "Botão principal",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ação operacional de maior prioridade. O snippet inclui tema escuro, foco e estado desabilitado.",
+      "html": "<button class=\"ds-button-primary\">Iniciar câmera</button>",
+      "css": ".ds-button-primary { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; min-height: 44px; border: 1px solid var(--border, #d9e2dc); background: var(--surface-elevated, #ffffff); color: var(--text-primary, #20332e); padding: 10px 16px; border-radius: var(--radius-sm, 8px); display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; line-height: 1.35; text-align: center; cursor: pointer; transition: background var(--transition, 150ms ease-out), border-color var(--transition, 150ms ease-out), color var(--transition, 150ms ease-out); } .ds-button-primary:hover:not(:disabled) { background: var(--surface-muted, #edf1ef); border-color: var(--text-secondary, #586960); } .ds-button-primary:disabled { opacity: .5; cursor: not-allowed; } .ds-button-primary:focus-visible { outline: 3px solid var(--primary, #17685b); outline-offset: 3px; } @media (prefers-reduced-motion: reduce) { .ds-button-primary { transition: none; } } .ds-button-primary { background: var(--primary, #17685b); color: white; border-color: transparent; } .ds-button-primary:hover:not(:disabled) { background: var(--primary-hover, #105448); } :host-context([data-theme='dark']) .ds-button-primary { color: #122b20; }"
+    },
+    {
+      "name": "Botão secundário",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Ação de apoio com contorno mineral.",
+      "html": "<button class=\"ds-button-secondary\">Cancelar</button>",
+      "css": ".ds-button-secondary { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; min-height: 44px; border: 1px solid var(--border, #d9e2dc); background: var(--surface-elevated, #ffffff); color: var(--text-primary, #20332e); padding: 10px 16px; border-radius: var(--radius-sm, 8px); display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; line-height: 1.35; text-align: center; cursor: pointer; transition: background var(--transition, 150ms ease-out), border-color var(--transition, 150ms ease-out), color var(--transition, 150ms ease-out); } .ds-button-secondary:hover:not(:disabled) { background: var(--surface-muted, #edf1ef); border-color: var(--text-secondary, #586960); } .ds-button-secondary:disabled { opacity: .5; cursor: not-allowed; } .ds-button-secondary:focus-visible { outline: 3px solid var(--primary, #17685b); outline-offset: 3px; } @media (prefers-reduced-motion: reduce) { .ds-button-secondary { transition: none; } }"
+    },
+    {
+      "name": "Botão de exclusão",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Variante de perigo usada na confirmação de exclusão; estados reproduzem as regras atuais do CSS.",
+      "html": "<button class=\"ds-button-danger\">Confirmar exclusão</button>",
+      "css": ".ds-button-danger { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; min-height: 44px; border: 1px solid var(--border, #d9e2dc); background: var(--surface-elevated, #ffffff); color: var(--text-primary, #20332e); padding: 10px 16px; border-radius: var(--radius-sm, 8px); display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; line-height: 1.35; text-align: center; cursor: pointer; transition: background var(--transition, 150ms ease-out), border-color var(--transition, 150ms ease-out), color var(--transition, 150ms ease-out); } .ds-button-danger:hover:not(:disabled) { background: var(--surface-muted, #edf1ef); border-color: var(--text-secondary, #586960); } .ds-button-danger:disabled { opacity: .5; cursor: not-allowed; } .ds-button-danger:focus-visible { outline: 3px solid var(--primary, #17685b); outline-offset: 3px; } @media (prefers-reduced-motion: reduce) { .ds-button-danger { transition: none; } } .ds-button-danger { background: var(--danger, #b53636); color: white; border-color: transparent; } :host-context([data-theme='dark']) .ds-button-danger { color: #31100e; }"
+    },
+    {
+      "name": "Botão de ícone",
+      "kind": "button",
+      "refersTo": "button-icon",
+      "description": "Ação compacta com nome acessível e área de toque quadrada. SVG extraído de Lucide X.",
+      "html": "<button class=\"ds-button-icon\" aria-label=\"Fechar\"><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"></path><path d=\"m6 6 12 12\"></path></svg></button>",
+      "css": ".ds-button-icon { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; min-height: 44px; border: 1px solid var(--border, #d9e2dc); background: var(--surface-elevated, #ffffff); color: var(--text-primary, #20332e); padding: 10px 16px; border-radius: var(--radius-sm, 8px); display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; line-height: 1.35; text-align: center; cursor: pointer; transition: background var(--transition, 150ms ease-out), border-color var(--transition, 150ms ease-out), color var(--transition, 150ms ease-out); } .ds-button-icon:hover:not(:disabled) { background: var(--surface-muted, #edf1ef); border-color: var(--text-secondary, #586960); } .ds-button-icon:disabled { opacity: .5; cursor: not-allowed; } .ds-button-icon:focus-visible { outline: 3px solid var(--primary, #17685b); outline-offset: 3px; } @media (prefers-reduced-motion: reduce) { .ds-button-icon { transition: none; } } .ds-button-icon { width: 44px; height: 44px; min-width: 44px; padding: 10px; background: transparent; border-color: transparent; flex-shrink: 0; } .ds-button-icon svg { flex-shrink: 0; }"
+    },
+    {
+      "name": "Botão de texto",
+      "kind": "button",
+      "refersTo": "button-text",
+      "description": "Ação auxiliar sem superfície no estado de repouso.",
+      "html": "<button class=\"ds-button-text\">Ver todos os registros</button>",
+      "css": ".ds-button-text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; min-height: 44px; border: 1px solid var(--border, #d9e2dc); background: var(--surface-elevated, #ffffff); color: var(--text-primary, #20332e); padding: 10px 16px; border-radius: var(--radius-sm, 8px); display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; line-height: 1.35; text-align: center; cursor: pointer; transition: background var(--transition, 150ms ease-out), border-color var(--transition, 150ms ease-out), color var(--transition, 150ms ease-out); } .ds-button-text:hover:not(:disabled) { background: var(--surface-muted, #edf1ef); border-color: var(--text-secondary, #586960); } .ds-button-text:disabled { opacity: .5; cursor: not-allowed; } .ds-button-text:focus-visible { outline: 3px solid var(--primary, #17685b); outline-offset: 3px; } @media (prefers-reduced-motion: reduce) { .ds-button-text { transition: none; } } .ds-button-text { background: transparent; border-color: transparent; padding-inline: 0; color: var(--primary, #17685b); }"
+    },
+    {
+      "name": "Campo de texto",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Campo comum com rótulo visível, contorno e foco do sistema.",
+      "html": "<label class=\"ds-field-label\" for=\"ds-session-name\">Nome do levantamento<input class=\"ds-field\" id=\"ds-session-name\" placeholder=\"Nome do levantamento\" autocomplete=\"off\"></label>",
+      "css": ".ds-field-label { display: flex; flex-direction: column; gap: 8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.5; font-weight: 550; color: var(--text-primary, #20332e); } .ds-field { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; min-height: 46px; width: 100%; min-width: 0; padding: 11px 12px; border: 1px solid var(--border, #d9e2dc); border-radius: var(--radius-sm, 8px); background: var(--surface-elevated, #ffffff); color: var(--text-primary, #20332e); line-height: 1.4; font-weight: 400; caret-color: var(--primary, #17685b); } .ds-field::placeholder { color: var(--text-secondary, #586960); opacity: 1; } .ds-field:focus-visible { outline: 3px solid var(--primary, #17685b); outline-offset: 2px; }"
+    },
+    {
+      "name": "Navegação principal",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Itens com ícone e linha de seleção. O celular conserva o nome acessível ao ocultar o rótulo visual. SVGs extraídos de Lucide ClipboardList e Settings2.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Navegação principal\"><button class=\"ds-nav-item ds-nav-active\" aria-label=\"Levantamentos\"><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect width=\"8\" height=\"4\" x=\"8\" y=\"2\" rx=\"1\" ry=\"1\"></rect><path d=\"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2\"></path><path d=\"M12 11h4\"></path><path d=\"M12 16h4\"></path><path d=\"M8 11h.01\"></path><path d=\"M8 16h.01\"></path></svg><span>Levantamentos</span></button><button class=\"ds-nav-item\" aria-label=\"Configurações\"><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M14 17H5\"></path><path d=\"M19 7h-9\"></path><circle cx=\"17\" cy=\"17\" r=\"3\"></circle><circle cx=\"7\" cy=\"7\" r=\"3\"></circle></svg><span>Configurações</span></button></nav>",
+      "css": ".ds-nav-item { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; min-height: 44px; border: 1px solid var(--border, #d9e2dc); background: var(--surface-elevated, #ffffff); color: var(--text-primary, #20332e); padding: 10px 16px; border-radius: var(--radius-sm, 8px); display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; line-height: 1.35; text-align: center; cursor: pointer; transition: background var(--transition, 150ms ease-out), border-color var(--transition, 150ms ease-out), color var(--transition, 150ms ease-out); } .ds-nav-item:hover:not(:disabled) { background: var(--surface-muted, #edf1ef); border-color: var(--text-secondary, #586960); } .ds-nav-item:disabled { opacity: .5; cursor: not-allowed; } .ds-nav-item:focus-visible { outline: 3px solid var(--primary, #17685b); outline-offset: 3px; } @media (prefers-reduced-motion: reduce) { .ds-nav-item { transition: none; } } .ds-nav { height: 84px; display: flex; align-items: center; gap: 8px; background: var(--surface-elevated, #ffffff); border-bottom: 1px solid var(--border, #d9e2dc); } .ds-nav-item { height: 100%; position: relative; font-size: 14px; border: 0; border-radius: 0; background: transparent; color: var(--text-secondary, #586960); } .ds-nav .ds-nav-item { background: transparent; } .ds-nav .ds-nav-active { color: var(--primary, #17685b); } .ds-nav-active::after { content: ''; position: absolute; bottom: -1px; left: 16px; right: 16px; height: 3px; background: var(--primary, #17685b); border-radius: 3px 3px 0 0; } .ds-nav-item svg { flex-shrink: 0; } @media (max-width: 767px) { .ds-nav { height: 70px; gap: 2px; } .ds-nav-item { width: 44px; padding: 10px; } .ds-nav-item span { display: none; } .ds-nav-active::after { left: 10px; right: 10px; } }"
+    },
+    {
+      "name": "Tag de revisão",
+      "kind": "chip",
+      "refersTo": "issue-tag",
+      "description": "Rótulo informativo de revisão; não é um controle interativo.",
+      "html": "<span class=\"ds-issue-tag\">Duplicado</span>",
+      "css": ".ds-issue-tag { display: inline-block; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 10px; line-height: 1.5; color: var(--warning, #855309); background: var(--warning-soft, #fff4dc); padding: 3px 6px; border-radius: 4px; margin: 2px 4px 2px 0; }"
+    },
+    {
+      "name": "Lista de levantamentos",
+      "kind": "card",
+      "refersTo": "session-card",
+      "description": "Contêiner plano e linha de levantamento. Texto demonstrativo restrito à documentação.",
+      "html": "<div class=\"ds-session-card\"><div class=\"ds-session-row\"><div class=\"ds-session-info\"><button class=\"ds-session-title\">Levantamento de exemplo</button><div class=\"ds-session-meta\"><span class=\"ds-status\">Em andamento</span></div></div></div></div>",
+      "css": ".ds-session-title { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; min-height: 44px; border: 1px solid var(--border, #d9e2dc); background: var(--surface-elevated, #ffffff); color: var(--text-primary, #20332e); padding: 10px 16px; border-radius: var(--radius-sm, 8px); display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; line-height: 1.35; text-align: center; cursor: pointer; transition: background var(--transition, 150ms ease-out), border-color var(--transition, 150ms ease-out), color var(--transition, 150ms ease-out); } .ds-session-title:hover:not(:disabled) { background: var(--surface-muted, #edf1ef); border-color: var(--text-secondary, #586960); } .ds-session-title:disabled { opacity: .5; cursor: not-allowed; } .ds-session-title:focus-visible { outline: 3px solid var(--primary, #17685b); outline-offset: 3px; } @media (prefers-reduced-motion: reduce) { .ds-session-title { transition: none; } } .ds-session-card { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: var(--text-primary, #20332e); border: 1px solid var(--border, #d9e2dc); border-radius: var(--radius, 14px); background: var(--surface-elevated, #ffffff); } .ds-session-row { padding: 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 20px; } .ds-session-info { flex: 1; min-width: 180px; } .ds-session-title { padding: 0; min-height: 32px; text-align: left; justify-content: flex-start; font-size: 18px; border: 0; background: transparent; overflow-wrap: anywhere; } .ds-session-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; font-size: 12px; line-height: 1.5; color: var(--text-secondary, #586960); margin-top: 4px; } .ds-status { display: inline-flex; align-items: center; gap: 6px; color: var(--primary, #17685b); } .ds-status::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; } @media (max-width: 767px) { .ds-session-row { padding: 18px 16px; gap: 14px; } .ds-session-title { font-size: 16px; min-height: 28px; } .ds-session-meta { font-size: 11px; gap: 4px 10px; } }"
+    },
+    {
+      "name": "Endereço atual",
+      "kind": "custom",
+      "refersTo": "active-address",
+      "description": "Componente de assinatura; a amostra mostra o estado vazio real, sem semear identificadores.",
+      "html": "<section class=\"ds-address\" aria-label=\"Endereço atual\"><div class=\"ds-address-heading\">Endereço atual</div><strong class=\"ds-address-value ds-address-empty\">Leia um endereço</strong><div class=\"ds-address-detail\">Depois, leia os produtos desta posição.</div></section>",
+      "css": ".ds-address { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--primary-soft, #e4f1ea); color: var(--primary, #17685b); border-radius: var(--radius, 14px); padding: 20px 24px; } .ds-address-heading { display: flex; align-items: center; justify-content: space-between; min-height: 36px; font-size: 13px; line-height: 1.5; font-weight: 600; } .ds-address-value { display: block; font-family: 'Cascadia Code', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; font-variant-numeric: tabular-nums; font-size: clamp(24px, 2.6vw, 36px); line-height: 1.25; letter-spacing: -.025em; margin: 8px 0 12px; overflow-wrap: anywhere; } .ds-address-empty { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 28px; letter-spacing: -.02em; } .ds-address-detail { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-size: 13px; line-height: 1.5; } @media (max-width: 1100px) { .ds-address { padding: 18px; } } @media (max-width: 767px) { .ds-address { padding: 12px 18px; } .ds-address-heading { font-size: 12px; min-height: 30px; } .ds-address-value { font-size: clamp(23px, 6.5vw, 32px); margin-top: 6px; margin-bottom: 10px; } .ds-address-empty { font-size: 25px; } .ds-address-detail { font-size: 12px; } } @media (max-width: 359px) { .ds-address { padding-inline: 14px; } .ds-address-value { font-size: 23px; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Painel de coleta industrial",
+    "overview": "Um painel prático, limpo e profissional para trabalhar entre prateleiras. Branco e superfícies minerais sustentam a leitura; verde profundo identifica ações e contexto operacional. A presença visual vem da precisão dos contornos, do ritmo entre grupos e da clareza dos identificadores.\n\nA tipografia do sistema mantém familiaridade e carregamento local. Códigos recebem uma família monoespaçada, números tabulares e quebra quando necessário. A densidade é funcional: informação próxima do controle correspondente, espaço suficiente para toque e nenhuma ornamentação que dispute atenção com a coleta. O tema escuro preserva os mesmos papéis com cores próprias.",
+    "keyCharacteristics": [
+      "Superfícies brancas e minerais, verde operacional e câmera escura.",
+      "Identificadores monoespaçados com quebra segura e números tabulares.",
+      "Separadores finos, cantos moderados e hierarquia por contraste tonal.",
+      "Controles frequentes com alvos amplos e foco de teclado explícito.",
+      "Movimento breve para reconhecer mudanças de estado."
+    ],
+    "rules": [
+      {
+        "name": "Operational Color",
+        "body": "Use o verde para ações, seleção e associação atual. Reserve âmbar para revisão e vermelho para erro ou exclusão; acompanhe o estado com texto ou ícone.",
+        "section": "colors"
+      },
+      {
+        "name": "Identifier Integrity",
+        "body": "Mantenha códigos em monoespaçada e permita quebra de linha. Não esconda caracteres necessários à conferência para encaixar o conteúdo.",
+        "section": "typography"
+      },
+      {
+        "name": "Overlay Elevation",
+        "body": "Use a sombra compartilhada em diálogos e avisos flutuantes. Listas, campos e áreas de trabalho se separam por borda e tom.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do reutilizar os tokens semânticos e suas substituições do tema escuro.",
+      "Do manter produtos e endereços em monoespaçada, com números tabulares e quebra de identificadores longos.",
+      "Do manter o endereço atual visualmente destacado e a resposta da leitura junto ao fluxo operacional.",
+      "Do preservar o foco visível e os alvos amplos dos controles frequentes.",
+      "Do usar texto e ícones junto às cores de sucesso, revisão e erro.",
+      "Do respeitar a preferência por movimento reduzido e a adaptação para telas estreitas."
+    ],
+    "donts": [
+      "Don't adicionar gradientes ou ornamentação de dashboard genérico.",
+      "Don't promover métricas decorativas acima da tarefa de coleta.",
+      "Don't usar sombras como decoração em todas as superfícies.",
+      "Don't truncar códigos que o operador precisa conferir.",
+      "Don't usar dados fictícios como conteúdo de uma sessão real."
+    ]
+  }
+}

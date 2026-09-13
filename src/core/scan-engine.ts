@@ -1,0 +1,264 @@
+import { db } from './database';
+import type { InventoryRecord, Session, Settings, Source } from './models';
+import { parseScan } from './parser';
+
+export type DuplicateCandidate = {
+  code: string;
+  address: string;
+  source: Source;
+  raw?: string;
+  sessionId: string;
+  paired: boolean;
+};
+export type ScanResult = {
+  kind: 'address' | 'product' | 'waiting' | 'error' | 'duplicate';
+  message: string;
+  value?: string;
+  record?: InventoryRecord;
+  duplicate?: DuplicateCandidate;
+};
+export function pairTransition(
+  session: Session,
+  type: 'address' | 'product',
+  value: string,
+  source: Source,
+  raw?: string,
+) {
+  if (session.mode === 'fixed')
+    return type === 'address'
+      ? { address: value }
+      : session.activeAddress
+        ? { pair: { code: value, address: session.activeAddress, source, raw } }
+        : { error: 'Leia um endereço antes de adicionar produtos.' };
+  const first = session.mode === 'product-address' ? 'product' : 'address';
+  if (!session.pending)
+    return type === first
+      ? { pending: { type, value, source, raw } }
+      : {
+          error: `Aguardando ${first === 'product' ? 'produto' : 'endereço'} para iniciar o par.`,
+        };
+  if (type === session.pending.type)
+    return {
+      error: `Aguardando ${type === 'product' ? 'endereço' : 'produto'}. Conclua ou cancele o par atual.`,
+    };
+  return {
+    pair: {
+      code: type === 'product' ? value : session.pending.value,
+      address: type === 'address' ? value : session.pending.value,
+      source: type === 'product' ? source : session.pending.source,
+      raw: type === 'product' ? raw : session.pending.raw,
+    },
+  };
+}
+export async function appendRecord(
+  candidate: DuplicateCandidate,
+  settings: Settings,
+  force = false,
+): Promise<ScanResult> {
+  const session = await db.sessions.get(candidate.sessionId);
+  if (!session || session.status === 'archived')
+    throw new Error('Abra um levantamento ativo para registrar.');
+  if (
+    settings.duplicates &&
+    !force &&
+    (await db.records
+      .where('[sessionId+code+address]')
+      .equals([session.id, candidate.code, candidate.address])
+      .count())
+  )
+    return {
+      kind: 'duplicate',
+      message: 'Este item já foi registrado neste endereço.',
+      duplicate: candidate,
+    };
+  const record: InventoryRecord = {
+    id: crypto.randomUUID(),
+    sessionId: session.id,
+    code: candidate.code,
+    address: candidate.address,
+    timestamp: Date.now(),
+    order: session.nextOrder,
+    source: candidate.source,
+    ...(settings.saveRaw && candidate.raw ? { rawScan: candidate.raw } : {}),
+  };
+  await db.records.add(record);
+  await db.sessions.update(session.id, {
+    count: session.count + 1,
+    nextOrder: session.nextOrder + 1,
+    updatedAt: Date.now(),
+    status: 'active',
+    ...(candidate.paired
+      ? { pending: null, activeAddress: candidate.address }
+      : {}),
+  });
+  return {
+    kind: 'product',
+    message: 'Produto registrado',
+    value: record.code,
+    record,
+  };
+}
+async function history(
+  sessionId: string,
+  source: Source,
+  raw: string,
+  normalized: string,
+  outcome: string,
+  settings: Settings,
+) {
+  await db.history.add({
+    id: crypto.randomUUID(),
+    sessionId,
+    source,
+    timestamp: Date.now(),
+    normalized: normalized.slice(0, 128),
+    outcome: outcome.slice(0, 240),
+    ...(settings.saveRaw ? { raw: raw.slice(0, 2048) } : {}),
+  });
+}
+export async function processScan(
+  sessionId: string,
+  raw: string,
+  source: Source,
+  settings: Settings,
+): Promise<ScanResult> {
+  return db.transaction('rw', db.sessions, db.records, db.history, async () => {
+    const session = await db.sessions.get(sessionId);
+    if (!session || session.status === 'archived')
+      throw new Error('Levantamento indisponível.');
+    const scan = parseScan(raw, settings.rules);
+    let result: ScanResult;
+    if (!scan.valid || scan.type === 'unknown')
+      result = { kind: 'error', message: scan.error ?? 'Código inválido.' };
+    else {
+      const transition = pairTransition(
+        session,
+        scan.type,
+        scan.normalized,
+        source,
+        settings.saveRaw ? raw : undefined,
+      );
+      if (transition.error)
+        result = { kind: 'error', message: transition.error };
+      else if (transition.address) {
+        await db.sessions.update(sessionId, {
+          activeAddress: transition.address,
+          updatedAt: Date.now(),
+        });
+        result = {
+          kind: 'address',
+          message:
+            session.activeAddress &&
+            session.activeAddress !== transition.address
+              ? `Endereço alterado: ${session.activeAddress} → ${transition.address}`
+              : 'Endereço selecionado',
+          value: transition.address,
+        };
+      } else if (transition.pending) {
+        await db.sessions.update(sessionId, {
+          pending: transition.pending,
+          updatedAt: Date.now(),
+        });
+        result = {
+          kind: 'waiting',
+          message: `Agora leia ${scan.type === 'product' ? 'o endereço' : 'o produto'}.`,
+          value: scan.normalized,
+        };
+      } else if (transition.pair)
+        result = await appendRecord(
+          { ...transition.pair, sessionId, paired: session.mode !== 'fixed' },
+          settings,
+        );
+      else throw new Error('Não foi possível associar a leitura.');
+      if (scan.warnings.length)
+        result.message += ` · ${scan.warnings.join(' ')}`;
+    }
+    await history(
+      sessionId,
+      source,
+      raw,
+      scan.normalized,
+      result.message,
+      settings,
+    );
+    return result;
+  });
+}
+export async function confirmDuplicate(
+  candidate: DuplicateCandidate,
+  settings: Settings,
+) {
+  return db.transaction('rw', db.sessions, db.records, db.history, async () => {
+    const result = await appendRecord(candidate, settings, true);
+    await history(
+      candidate.sessionId,
+      candidate.source,
+      candidate.raw ?? candidate.code,
+      candidate.code,
+      'Repetição adicionada pelo operador',
+      settings,
+    );
+    return result;
+  });
+}
+export async function addManual(
+  sessionId: string,
+  code: string,
+  address: string,
+  settings: Settings,
+) {
+  const product = parseScan(code, settings.rules),
+    location = parseScan(address, settings.rules);
+  if (product.type !== 'product' || !product.valid)
+    throw new Error(product.error ?? 'Informe um código de produto válido.');
+  if (location.type !== 'address' || !location.valid)
+    throw new Error(location.error ?? 'Informe um endereço válido.');
+  return db.transaction('rw', db.sessions, db.records, db.history, async () => {
+    const result = await appendRecord(
+      {
+        sessionId,
+        code: product.normalized,
+        address: location.normalized,
+        source: 'manual',
+        raw: code,
+        paired: false,
+      },
+      settings,
+    );
+    await history(
+      sessionId,
+      'manual',
+      code,
+      product.normalized,
+      result.message,
+      settings,
+    );
+    return result;
+  });
+}
+export async function editRecords(
+  sessionId: string,
+  ids: string[],
+  address: string,
+  settings: Settings,
+  code?: string,
+) {
+  const location = parseScan(address, settings.rules),
+    product = code === undefined ? undefined : parseScan(code, settings.rules);
+  if (location.type !== 'address' || !location.valid)
+    throw new Error('Endereço fora do padrão configurado.');
+  if (product && (product.type !== 'product' || !product.valid))
+    throw new Error('Código fora do padrão configurado.');
+  await db.transaction('rw', db.sessions, db.records, async () => {
+    for (const id of ids) {
+      const row = await db.records.get(id);
+      if (row?.sessionId === sessionId)
+        await db.records.update(id, {
+          address: location.normalized,
+          source: 'manual',
+          ...(product ? { code: product.normalized } : {}),
+        });
+    }
+    await db.sessions.update(sessionId, { updatedAt: Date.now() });
+  });
+}
