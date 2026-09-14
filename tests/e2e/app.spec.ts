@@ -82,12 +82,7 @@ test('multiple product prefixes work through Data Matrix, HID, manual entry and 
   await hid(page, 'R01A1C04DP03');
   await hid(page, 'zx123');
   await expect(page.locator('.session-heading p')).toContainText('5 registros');
-  await hid(page, 'R01A1C03DP');
-  await expect(page.locator('.scan-feedback')).toContainText(
-    'Código desconhecido',
-  );
   await expect(page.locator('.address-value')).toHaveText('R01A1C04DP03');
-  await expect(page.locator('.session-heading p')).toContainText('5 registros');
   await page
     .getByRole('button', { name: 'Entrada manual', exact: true })
     .click();

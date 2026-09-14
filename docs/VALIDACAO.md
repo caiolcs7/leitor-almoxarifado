@@ -1,13 +1,13 @@
 # Validação da entrega
 
-Execução local em 12–13/09/2026, Windows, Node.js 24.19.0, Chromium automatizado pelo Playwright 1.63.0. Os resultados abaixo descrevem testes executados; emulação de tela e câmera sintética não equivalem a homologação em celulares físicos.
+Execução em 12–14/09/2026, Windows/Linux, Node.js 24.19.0, Chromium automatizado pelo Playwright 1.63.0. Os resultados abaixo descrevem testes executados; emulação de tela e câmera sintética não equivalem a homologação em celulares físicos.
 
 ## Resultado técnico
 
 | Verificação            | Resultado                                                                |
 | ---------------------- | ------------------------------------------------------------------------ |
-| `npm run test`         | 85 testes aprovados em 6 arquivos                                        |
-| `npm run test:e2e`     | 8 cenários aprovados, aproximadamente 1,1 minuto                         |
+| `npm run test`         | 101 testes aprovados em 6 arquivos                                       |
+| `npm run test:e2e`     | 9 cenários de navegador                                                  |
 | `npm run lint`         | Aprovado, sem erros ou avisos                                            |
 | `npm run typecheck`    | Aprovado; também executado no build                                      |
 | `npm run build`        | Aprovado; manifest, service worker, worker e WASM gerados                |

@@ -100,6 +100,7 @@ export function ManualDialog({
           <input
             className="mono"
             required
+            aria-describedby="manual-address-help"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             maxLength={128}
@@ -107,10 +108,10 @@ export function ManualDialog({
             autoCapitalize="characters"
             spellCheck={false}
           />
-          <span className="helper">
-            Preenchido automaticamente com o último endereço lido.
-          </span>
         </label>
+        <p className="helper" id="manual-address-help">
+          Preenchido automaticamente com o último endereço lido.
+        </p>
         {error && (
           <p className="form-error" role="alert">
             {error}
