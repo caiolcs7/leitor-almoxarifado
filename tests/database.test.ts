@@ -140,14 +140,17 @@ describe('durable sessions and scan state machine', () => {
     );
     expect((await db.sessions.get(s.id))?.pending?.value).toBe('ITPROD1');
   });
-  it('validates manual input, batch edits, undo and restoration', async () => {
+  it('accepts unrestricted and special manual inputs, batch edits, undo and restoration', async () => {
     const s = await setup();
-    await expect(
-      addManual(s.id, 'ITP...', 'R14B77', settings),
-    ).rejects.toThrow();
+    await addManual(s.id, 'ITP...', 'R14B77', settings);
     await addManual(s.id, 'itprod1', 'r14b77', settings);
     await addManual(s.id, 'ITPROD2', 'R14B77', settings);
+    await addManual(s.id, 'SEM CODIGO', 'R14B77', settings);
+    await addManual(s.id, 'VAZIO', 'R14B77', settings);
     const rows = await db.records.toArray();
+    expect(rows.map((row) => row.code)).toEqual(
+      expect.arrayContaining(['ITP...', 'SEM CODIGO', 'VAZIO']),
+    );
     await editRecords(
       s.id,
       rows.map((r) => r.id),
@@ -158,10 +161,10 @@ describe('durable sessions and scan state machine', () => {
       (await db.records.toArray()).every((r) => r.address === 'R01A1C03DP02'),
     ).toBe(true);
     const removed = await removeRecords(s.id, [rows[0].id]);
-    expect((await db.sessions.get(s.id))?.count).toBe(1);
+    expect((await db.sessions.get(s.id))?.count).toBe(4);
     await restoreRecords(removed);
     await restoreRecords(removed);
-    expect((await db.sessions.get(s.id))?.count).toBe(2);
+    expect((await db.sessions.get(s.id))?.count).toBe(5);
   });
   it('duplicates, archives, renames and deletes sessions independently', async () => {
     const s = await setup();

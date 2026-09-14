@@ -26,9 +26,10 @@ async function hid(page: Page, value: string) {
   await input.press('Enter');
 }
 async function imageScan(page: Page, name: string) {
+  const filename = name.includes('.') ? name : `${name}.png`;
   await page
     .getByLabel('Selecionar imagem da etiqueta')
-    .setInputFiles(path.resolve(`tests/fixtures/${name}.png`));
+    .setInputFiles(path.resolve(`tests/fixtures/${filename}`));
 }
 async function readyOffline(page: Page) {
   await expect(
@@ -115,6 +116,42 @@ test('multiple product prefixes work through Data Matrix, HID, manual entry and 
     ['ZX123', 'R01A1C04DP03'],
     ['ML999', 'R01A1C04DP03'],
   ]);
+});
+
+test('real GS1 product and prefixed address labels work with special manual records', async ({
+  page,
+}) => {
+  await create(page, 'Etiquetas reais');
+  await imageScan(page, 'address-prefixed-real.jpg');
+  await expect(page.locator('.address-value')).toHaveText('R02A1C01EP02');
+  await imageScan(page, 'product-gs1-real.jpg');
+  await expect(page.locator('.session-heading p')).toContainText('1 registros');
+
+  await page
+    .getByRole('button', { name: 'Entrada manual', exact: true })
+    .click();
+  await expect(
+    page.getByRole('textbox', { name: 'Endereço', exact: true }),
+  ).toHaveValue('R02A1C01EP02');
+  await page.getByLabel('SEM CÓDIGO', { exact: true }).check();
+  await page
+    .getByRole('button', { name: 'Adicionar registro', exact: true })
+    .click();
+
+  await page
+    .getByRole('button', { name: 'Entrada manual', exact: true })
+    .click();
+  await page.getByLabel('VAZIO', { exact: true }).check();
+  await page
+    .getByRole('button', { name: 'Adicionar registro', exact: true })
+    .click();
+  await expect(page.locator('.session-heading p')).toContainText('3 registros');
+
+  await page.getByRole('button', { name: 'Registros 3', exact: true }).click();
+  await expect(page.locator('tbody')).toContainText('MPC149M050P6');
+  await expect(page.locator('tbody')).toContainText('SEM CODIGO');
+  await expect(page.locator('tbody')).toContainText('VAZIO');
+  await expect(page.locator('tbody')).toContainText('R02A1C01EP02');
 });
 
 test('acceptance: Data Matrix images, browser restart, offline WASM and actual XLSX download', async () => {

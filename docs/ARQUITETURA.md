@@ -4,21 +4,21 @@ Aplicação React 19 + TypeScript strict + Vite 8. A interface é dividida em se
 
 ## Fluxo dos dados
 
-Todas as entradas passam pelo mesmo parser: Unicode NFKC → remoção de espaços, controles e invisíveis → identificador AIM conhecido → maiúsculas → wrapper configurado sem ambiguidade → classificação → regra opcional de endereço → associação.
+Todas as entradas passam pelo mesmo parser: Unicode NFKC → identificação de envelope GS1 251/37 → remoção de espaços, controles e invisíveis → identificador AIM conhecido → maiúsculas → remoção do prefixo de site antes de um endereço completo → wrapper configurado → classificação → regra opcional de endereço → associação.
 
-Após a confirmação de múltiplas famílias de produto, o padrão aceita códigos alfanuméricos de 2–64 caracteres começando por letra, sem lista fixa de prefixos. R fica reservado aos endereços na configuração padrão, mas só formatos completos de posição são aceitos. Um endereço R incompleto não vira produto. Correspondência simultânea a regras personalizadas de produto e endereço é recusada. Prefixos 251 e sufixos 371 não são removidos por padrão; exigem uma configuração de wrapper completo, um payload válido e um original não válido. Não há inferência de caracteres ausentes.
+O padrão aceita códigos industriais normalizados sem lista fixa de prefixos. Uma posição completa tem precedência e segue `R<rua>A<andar>C<coluna><lado>P<prateleira>` ou o formato simples de bombona. Os lados D e E, além de outros identificadores de letra única, são aceitos. O envelope de endereço `A1;` é removido apenas quando o restante forma uma posição completa. Data Matrix GS1 em apresentação HRI, texto simples com separador GS ou representação escapada têm os AIs 251/37 removidos automaticamente; wrappers configurados continuam disponíveis para outros leitores. Não há inferência de caracteres ausentes.
 
 O modo fixo guarda `activeAddress`. Ler um endereço só altera esse estado. Ler um produto sem endereço retorna erro sem registro. Os modos pareados guardam um primeiro elemento em `pending`, exigem a ordem escolhida e limpam o par apenas após registro ou cancelamento. Outro elemento do mesmo tipo não substitui silenciosamente o primeiro.
 
 ## Persistência e concorrência
 
-Dexie abstrai IndexedDB, com schema versão 2 e tabelas `sessions`, `records`, `settings` e `history`. A migração de v1 para v2 amplia somente a antiga regra padrão de produtos IT; sessões, registros, preferências e regras personalizadas são preservados. A restauração das configurações de um backup antigo usa a mesma correção. Os índices incluem sessão/ordem, sessão/código/endereço e sessão/horário. Cada leitura executa transação atômica envolvendo registro, contador, estado do par/endereço e histórico. A sequência monotônica não é reutilizada após desfazer. Alterações não dependem de servidor.
+Dexie abstrai IndexedDB, com schema versão 3 e tabelas `sessions`, `records`, `settings` e `history`. As migrações ampliam apenas regras padrão publicadas anteriormente; sessões, registros, preferências e regras personalizadas são preservados. A restauração das configurações de um backup antigo usa a mesma correção. Os índices incluem sessão/ordem, sessão/código/endereço e sessão/horário. Cada leitura executa transação atômica envolvendo registro, contador, estado do par/endereço e histórico. A sequência monotônica não é reutilizada após desfazer. Alterações não dependem de servidor.
 
 Backup JSON validado com Zod verifica estrutura, versão, referências, identificadores repetidos e regras. A restauração é transacional e usa novos IDs; quantidades e próxima ordem são recalculadas. Câmeras e IDs de dispositivo importados podem precisar ser escolhidos novamente em outro aparelho.
 
 ## Leitura e repetição
 
-`ScannerService` gerencia câmera, seleção de dispositivo, foco contínuo quando suportado, zoom, lanterna, ciclo de decodificação e liberação de `MediaStream`. Usa traseira/resolução ideal 1280×720 e processa no máximo um frame por vez, com pausa de 160 ms entre tentativas. A decodificação WASM roda em Web Worker.
+`ScannerService` gerencia câmera, seleção de dispositivo, foco contínuo quando suportado, zoom, lanterna, ciclo de decodificação e liberação de `MediaStream`. Usa a câmera traseira com resolução ideal de 1920×1080 e preserva até 1920 px de largura para Data Matrix pequenos, processando no máximo um frame por vez, com pausa de 160 ms entre tentativas. A decodificação WASM roda em Web Worker.
 
 Quando `BarcodeDetector.getSupportedFormats()` inclui `data_matrix`, a API nativa é usada. Após erros repetidos, o scanner passa para ZXing-C++; o fallback também é tentado periodicamente quando o nativo não encontra nada. Câmera e imagens rejeitam múltiplas etiquetas no mesmo enquadramento, para evitar associação por ordem arbitrária. Sequências estruturadas incompletas não são aceitas.
 

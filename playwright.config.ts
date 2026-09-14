@@ -14,7 +14,7 @@ export default defineConfig({
   },
   webServer: {
     command:
-      'npm run build:e2e && npm run preview -- --outDir dist-test --base=/teste-subpasta/ --port 4173 --strictPort',
+      'npm run build:e2e && npm run preview -- --host 127.0.0.1 --outDir dist-test --base=/teste-subpasta/ --port 4173 --strictPort',
     url: 'http://127.0.0.1:4173/teste-subpasta/',
     reuseExistingServer: false,
     timeout: 120000,

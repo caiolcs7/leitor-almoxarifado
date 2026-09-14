@@ -32,9 +32,9 @@ O mesmo cenário verificou edição e exclusão offline, recarga, desfazer e res
 
 ## Cobertura de leitura e dados
 
-A atualização de 13/09 ampliou os prefixos de produto. Novas imagens Data Matrix de ML, MPC, STC e MPL foram decodificadas de fato. O cenário de navegador leu essas imagens offline, adicionou outro prefixo por HID e um código `Ml` por entrada manual, rejeitou endereço R incompleto, recarregou e conferiu os seis pares no XLSX baixado. Códigos desses testes são exemplos sintéticos e não são adicionados aos levantamentos do usuário.
+A atualização de 14/09 foi validada contra recortes das etiquetas reais fornecidas: o decoder extraiu `251MPC149M050P6<GS>371`, `251ITCP001M0016A<GS>371` e `A1;R02A1C01EP02`; o parser produziu respectivamente `MPC149M050P6`, `ITCP001M0016A` e `R02A1C01EP02`. Casos HRI equivalentes para MPC, STPC e ITCP também possuem regressão automatizada. O cenário de navegador confirma que o endereço lido preenche a entrada manual e que `SEM CODIGO` e `VAZIO` são persistidos como registros explícitos.
 
-Dois testes de migração abriram um banco v1 com dados existentes e verificaram atualização para v2, preservando registros, endereço ativo, par pendente, preferências e regras personalizadas. Um teste adicional restaurou configurações de backup antigo e confirmou que a restrição a IT não voltou.
+Dois testes de migração abriram um banco v1 com dados existentes e verificaram atualização para v3, preservando registros, endereço ativo, par pendente, preferências e regras personalizadas. Um teste adicional restaurou configurações de backup antigo e confirmou que a restrição a IT não voltou.
 
 - Data Matrix normal, rotacionado e invertido, incluindo os formatos de endereço complexo e bombona; QR Code e Code 128 também decodificados em testes próprios.
 - Imagem sem código rejeitada; controles, espaços, Unicode, identificadores AIM, wrappers completos e ambiguidade exercitados no parser.
@@ -71,7 +71,7 @@ Evidências locais são geradas em `artifacts/` (ignorado pelo Git), incluindo o
 - Não foram testados telefones físicos Android/iPhone, câmera real com etiquetas do almoxarifado, scanner USB/Bluetooth físico, lanterna, zoom, foco, vibração ou instalação PWA em celular. O navegador e o hardware determinam o suporte dessas APIs.
 - Chrome/Edge/Safari físicos não foram homologados individualmente. Os testes automatizados usaram Chromium; a responsividade foi emulada.
 - Não houve teste de carga prolongado com dezenas de milhares de registros ou medição de bateria em turno de trabalho. A leitura real de etiquetas danificadas, refletivas ou distantes precisa ser conferida com as etiquetas disponíveis no local.
-- Produtos aceitam diferentes prefixos alfanuméricos começando por letra; R fica reservado aos endereços na regra padrão. Produtos começando R ou compostos apenas por números precisam de uma regra explícita para evitar confusão com posições e wrappers numéricos. Nenhum código parcial é completado automaticamente.
+- Produtos não possuem lista de prefixos. A validação técnica permanece limitada a 128 caracteres normalizados e ao conjunto seguro usado pelos identificadores industriais (`A-Z`, `0-9`, ponto, sublinhado, barra e hífen). Endereços só recebem tratamento especial quando formam uma posição completa; nenhum código parcial é completado automaticamente.
 - IndexedDB mantém dados por origem e navegador, mas não é backup externo. Limpar os dados do navegador, trocar origem ou perder o dispositivo pode impedir a recuperação. Há exportação e restauração JSON para esse fim.
 - Importação XLSX e sincronização em nuvem não foram implementadas; a primeira era opcional e a segunda ficou explicitamente fora do escopo.
 

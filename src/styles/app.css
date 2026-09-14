@@ -210,7 +210,7 @@
     font-weight: 550;
     font-size: 14px;
   }
-  input:not([type='checkbox']):not([type='range']),
+  input:not([type='checkbox']):not([type='range']):not([type='radio']),
   select,
   textarea {
     min-height: 46px;
@@ -1567,6 +1567,52 @@
     font-size: 12px;
     margin-top: 14px;
   }
+  .manual-entry-options {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin: 0 0 20px;
+    padding: 0;
+    border: 0;
+  }
+  .manual-entry-options legend {
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 550;
+  }
+  .manual-entry-options label,
+  .modal .manual-entry-options label + label {
+    min-height: 46px;
+    margin: 0;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    text-align: center;
+    line-height: 1.2;
+  }
+  .manual-entry-options label:has(input:checked) {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+  .manual-entry-options input {
+    width: 17px;
+    height: 17px;
+    min-height: 17px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    accent-color: var(--primary);
+    flex: 0 0 auto;
+  }
   .modal-actions {
     display: flex;
     justify-content: flex-end;
@@ -2280,7 +2326,7 @@
     .modal label {
       font-size: 13px;
     }
-    .modal input:not([type='checkbox']),
+    .modal input:not([type='checkbox']):not([type='radio']),
     .modal textarea,
     .modal select {
       font-size: 16px;
@@ -2296,6 +2342,14 @@
     }
     .modal-actions.wrap > button {
       flex: 1 1 45%;
+    }
+    .manual-entry-options {
+      grid-template-columns: 1fr;
+    }
+    .manual-entry-options label,
+    .modal .manual-entry-options label + label {
+      justify-content: flex-start;
+      min-height: 44px;
     }
     .toast {
       bottom: max(16px, env(safe-area-inset-bottom));

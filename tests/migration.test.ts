@@ -34,6 +34,10 @@ describe('upgrade from the published database v1', () => {
       });
       const settings = structuredClone(defaultSettings);
       settings.rules.productPatterns = patterns;
+      settings.rules.addressPatterns = [
+        '^R[0-9]{2,3}A[0-9]{1,3}C[0-9]{1,3}DP[0-9]{1,3}$',
+        '^R[0-9]{2,3}B[0-9]{1,3}$',
+      ];
       settings.rules.padB = true;
       settings.rules.wrappers = [{ prefix: '251', suffix: '371' }];
       settings.theme = 'dark';
@@ -69,7 +73,7 @@ describe('upgrade from the published database v1', () => {
       const updated = new InventoryDatabase(name);
       try {
         await updated.open();
-        expect(updated.verno).toBe(2);
+        expect(updated.verno).toBe(3);
         expect(await updated.sessions.get(session.id)).toEqual(session);
         expect(await updated.records.get(record.id)).toEqual(record);
         const saved = (await updated.settings.get('main'))!;
@@ -80,6 +84,7 @@ describe('upgrade from the published database v1', () => {
             productPatterns: expand
               ? defaultSettings.rules.productPatterns
               : patterns,
+            addressPatterns: defaultSettings.rules.addressPatterns,
           },
         });
         expect(parseScan('ML12345', saved.rules).valid).toBe(expand);

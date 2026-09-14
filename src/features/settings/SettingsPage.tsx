@@ -250,17 +250,17 @@ export function SettingsPage({ settings }: { settings: Settings }) {
               }
             />
             <p className="helper">
-              Produtos aceitam prefixos como IT, ML, MPC, STC, MPL e outros. Na
-              regra padrão, R fica reservado aos endereços, que precisam
-              corresponder ao formato completo da posição.
+              Produtos não têm restrição de prefixo. Etiquetas GS1 com os
+              identificadores 251/37 são limpas automaticamente. Endereços
+              completos são reconhecidos pela estrutura da posição.
             </p>
             <details className="advanced">
               <summary>Padrões e normalização avançada</summary>
               <p className="helper">
                 Um padrão por linha, com ^ e $. Use letras, números, classes
                 como [A-Z] e limites como &#123;3,64&#125;. Não são aceitos
-                grupos nem repetições abertas. Um código que corresponda a
-                produto e endereço será recusado.
+                grupos nem repetições abertas. Quando um valor também formar um
+                endereço completo, ele será tratado como endereço.
               </p>
               <label>
                 Padrões de produto

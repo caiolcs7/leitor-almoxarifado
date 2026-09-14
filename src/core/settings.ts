@@ -1,15 +1,33 @@
 import { defaultSettings, type Settings } from './models';
 
-/** Upgrade the original IT-only default without replacing customized rules. */
+const publishedProductDefaults = [
+  '^IT[A-Z0-9]{3,62}$',
+  '^[A-QS-Z][A-Z0-9]{1,63}$',
+];
+const publishedAddressDefaults = [
+  '^R[0-9]{2,3}A[0-9]{1,3}C[0-9]{1,3}DP[0-9]{1,3}$',
+  '^R[0-9]{2,3}B[0-9]{1,3}$',
+];
+
+/** Upgrade known published defaults without replacing customized rules. */
 export function upgradeLegacySettings(settings: Settings): Settings {
-  const patterns = settings.rules.productPatterns;
-  if (patterns.length !== 1 || patterns[0] !== '^IT[A-Z0-9]{3,62}$')
-    return settings;
+  const productIsPublishedDefault =
+    settings.rules.productPatterns.length === 1 &&
+    publishedProductDefaults.includes(settings.rules.productPatterns[0]);
+  const addressIsPublishedDefault =
+    JSON.stringify(settings.rules.addressPatterns) ===
+    JSON.stringify(publishedAddressDefaults);
+  if (!productIsPublishedDefault && !addressIsPublishedDefault) return settings;
   return {
     ...settings,
     rules: {
       ...settings.rules,
-      productPatterns: [...defaultSettings.rules.productPatterns],
+      productPatterns: productIsPublishedDefault
+        ? [...defaultSettings.rules.productPatterns]
+        : settings.rules.productPatterns,
+      addressPatterns: addressIsPublishedDefault
+        ? [...defaultSettings.rules.addressPatterns]
+        : settings.rules.addressPatterns,
     },
   };
 }

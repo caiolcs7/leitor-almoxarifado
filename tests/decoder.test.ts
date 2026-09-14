@@ -60,6 +60,32 @@ describe('ZXing-C++ actual image decoding', () => {
     );
     expect(result[0].text).toBe('R01A1C03DP02');
   });
+  it.each([
+    ['product-gs1-real.jpg', 'MPC149M050P6'],
+    ['product-mpc2-gs1-real.jpg', 'MPC148M020GN'],
+    ['product-stpc-gs1-real.jpg', 'STPC148M0020N'],
+    ['product-itcp-gs1-real.jpg', 'ITCP001M0016A'],
+    ['address-prefixed-real.jpg', 'R02A1C01EP02'],
+  ])(
+    'decodes and normalizes the real warehouse label %s',
+    async (name, value) => {
+      const result = await readBarcodes(
+        new Uint8Array(readFileSync(`tests/fixtures/${name}`)),
+        {
+          formats: ['DataMatrix'],
+          textMode: 'Plain',
+          tryHarder: true,
+          tryInvert: true,
+          tryRotate: true,
+        },
+      );
+      expect(result).toHaveLength(1);
+      expect(parseScan(result[0].text, defaultSettings.rules)).toMatchObject({
+        valid: true,
+        normalized: value,
+      });
+    },
+  );
   it('does not invent a reading from a blank image', async () =>
     expect(
       await readBarcodes(

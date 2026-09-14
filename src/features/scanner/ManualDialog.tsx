@@ -14,6 +14,7 @@ export function ManualDialog({
   onResult: (result: ScanResult) => void;
 }) {
   const [code, setCode] = useState(''),
+    [entryType, setEntryType] = useState<'code' | 'no-code' | 'empty'>('code'),
     [address, setAddress] = useState(session.activeAddress),
     [busy, setBusy] = useState(false),
     [error, setError] = useState('');
@@ -28,7 +29,15 @@ export function ManualDialog({
           e.preventDefault();
           setBusy(true);
           try {
-            onResult(await addManual(session.id, code, address, settings));
+            const resolvedCode =
+              entryType === 'no-code'
+                ? 'SEM CODIGO'
+                : entryType === 'empty'
+                  ? 'VAZIO'
+                  : code;
+            onResult(
+              await addManual(session.id, resolvedCode, address, settings),
+            );
             onClose();
           } catch (err) {
             setError(errorMessage(err));
@@ -37,20 +46,55 @@ export function ManualDialog({
           }
         }}
       >
-        <label>
-          Código do Produto
-          <input
-            autoFocus
-            className="mono"
-            required
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            maxLength={128}
-            autoComplete="off"
-            autoCapitalize="characters"
-            spellCheck={false}
-          />
-        </label>
+        <fieldset className="manual-entry-options">
+          <legend>Como registrar o produto</legend>
+          <label>
+            <input
+              type="radio"
+              name="manual-entry-type"
+              value="code"
+              checked={entryType === 'code'}
+              onChange={() => setEntryType('code')}
+            />
+            Informar código
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="manual-entry-type"
+              value="no-code"
+              checked={entryType === 'no-code'}
+              onChange={() => setEntryType('no-code')}
+            />
+            SEM CÓDIGO
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="manual-entry-type"
+              value="empty"
+              checked={entryType === 'empty'}
+              onChange={() => setEntryType('empty')}
+            />
+            VAZIO
+          </label>
+        </fieldset>
+        {entryType === 'code' && (
+          <label>
+            Código do Produto
+            <input
+              autoFocus
+              className="mono"
+              required
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              maxLength={128}
+              autoComplete="off"
+              autoCapitalize="characters"
+              spellCheck={false}
+            />
+          </label>
+        )}
         <label>
           Endereço
           <input
@@ -63,6 +107,9 @@ export function ManualDialog({
             autoCapitalize="characters"
             spellCheck={false}
           />
+          <span className="helper">
+            Preenchido automaticamente com o último endereço lido.
+          </span>
         </label>
         {error && (
           <p className="form-error" role="alert">

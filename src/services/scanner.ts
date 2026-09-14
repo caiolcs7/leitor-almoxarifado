@@ -59,8 +59,8 @@ export class ScannerService {
           ...(cameraId
             ? { deviceId: { exact: cameraId } }
             : { facingMode: { ideal: 'environment' } }),
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
         },
         audio: false,
       });
@@ -135,7 +135,9 @@ export class ScannerService {
           this.timer = setTimeout(() => void tick(), 150);
           return;
         }
-        const scale = Math.min(1, 1280 / video.videoWidth);
+        // Preserve enough source detail for the small, dense industrial Data
+        // Matrix labels while bounding CPU use on 4K mobile cameras.
+        const scale = Math.min(1, 1920 / video.videoWidth);
         canvas.width = Math.round(video.videoWidth * scale);
         canvas.height = Math.round(video.videoHeight * scale);
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -154,7 +156,7 @@ export class ScannerService {
             }
           }
         }
-        if (!values.length && (!this.native || this.missedFrames % 4 === 0))
+        if (!values.length && (!this.native || this.missedFrames % 2 === 0))
           values = await this.decoder.decode(
             ctx.getImageData(0, 0, canvas.width, canvas.height),
           );

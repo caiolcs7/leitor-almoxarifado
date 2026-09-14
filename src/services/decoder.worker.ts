@@ -15,6 +15,7 @@ self.onmessage = async ({ data }: MessageEvent<DecodeRequest>) => {
       tryHarder: true,
       tryRotate: true,
       tryInvert: true,
+      textMode: 'Plain',
       maxNumberOfSymbols: 4,
       returnErrors: false,
     });

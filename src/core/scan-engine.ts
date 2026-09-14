@@ -207,9 +207,11 @@ export async function addManual(
   address: string,
   settings: Settings,
 ) {
-  const product = parseScan(code, settings.rules),
+  const specialCode =
+    code === 'SEM CODIGO' || code === 'VAZIO' ? code : undefined;
+  const product = specialCode ? undefined : parseScan(code, settings.rules),
     location = parseScan(address, settings.rules);
-  if (product.type !== 'product' || !product.valid)
+  if (product && (product.type !== 'product' || !product.valid))
     throw new Error(product.error ?? 'Informe um código de produto válido.');
   if (location.type !== 'address' || !location.valid)
     throw new Error(location.error ?? 'Informe um endereço válido.');
@@ -217,7 +219,7 @@ export async function addManual(
     const result = await appendRecord(
       {
         sessionId,
-        code: product.normalized,
+        code: specialCode ?? product!.normalized,
         address: location.normalized,
         source: 'manual',
         raw: code,
@@ -229,7 +231,7 @@ export async function addManual(
       sessionId,
       'manual',
       code,
-      product.normalized,
+      specialCode ?? product!.normalized,
       result.message,
       settings,
     );
