@@ -32,6 +32,64 @@ async function setup() {
   return createSession('Teste R01', 'fixed');
 }
 describe('durable sessions and scan state machine', () => {
+  it.each(['fixed', 'product-address', 'address-product'] as const)(
+    'requires address approval and preserves stored records in %s',
+    async (mode) => {
+      const session = await createSession('Troca protegida', mode);
+      await db.sessions.update(session.id, {
+        activeAddress: 'R14B77',
+        pending:
+          mode === 'product-address'
+            ? { type: 'product', value: 'ML12345', source: 'camera' }
+            : null,
+      });
+      const before = await db.sessions.get(session.id);
+      const request = await processScan(
+        session.id,
+        'R14B78',
+        'camera',
+        settings,
+      );
+      expect(request.kind).toBe('address-change');
+      expect(await db.sessions.get(session.id)).toEqual(before);
+      expect(await db.records.count()).toBe(0);
+      const accepted = await processScan(
+        session.id,
+        'R14B78',
+        'camera',
+        settings,
+        request.addressChange,
+      );
+      expect(accepted.kind).toBe(
+        mode === 'fixed'
+          ? 'address'
+          : mode === 'product-address'
+            ? 'product'
+            : 'waiting',
+      );
+      if (mode === 'address-product')
+        await processScan(session.id, 'ML12345', 'camera', settings);
+      expect((await db.sessions.get(session.id))?.activeAddress).toBe('R14B78');
+      await expect(
+        processScan(
+          session.id,
+          'R14B78',
+          'camera',
+          settings,
+          request.addressChange,
+        ),
+      ).rejects.toThrow('mudou');
+    },
+  );
+  it('old backups default to button capture and preserve continuous preference in new backups', async () => {
+    const backup = await createBackup();
+    const old = JSON.parse(JSON.stringify(backup));
+    delete old.settings.cameraCapture;
+    expect(validateBackup(old).settings.cameraCapture).toBe('button');
+    backup.settings.cameraCapture = 'continuous';
+    await importBackup(backup, true);
+    expect((await db.settings.get('main'))?.cameraCapture).toBe('continuous');
+  });
   it('restores legacy backup settings without bringing back the IT-only default', async () => {
     const session = await setup();
     await processScan(session.id, 'R01A1C02DP01', 'hid', settings);
@@ -58,8 +116,11 @@ describe('durable sessions and scan state machine', () => {
       'ITPRCSEM03AI4',
       'R01A1C04DP02',
       'ITARSRM003AI4',
-    ])
-      await processScan(s.id, code, 'hid', settings);
+    ]) {
+      const result = await processScan(s.id, code, 'hid', settings);
+      if (result.addressChange)
+        await processScan(s.id, code, 'hid', settings, result.addressChange);
+    }
     const rows = await db.records
       .where('sessionId')
       .equals(s.id)

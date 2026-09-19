@@ -9,6 +9,35 @@ import {
 import { parseScan } from '../src/core/parser';
 
 describe('upgrade from the published database v1', () => {
+  it.each([2, 3])(
+    'adds the safe capture default to a published v%s database without altering custom rules',
+    async (version) => {
+      const name = `migration-v2-${crypto.randomUUID()}`;
+      const legacy = new Dexie(name);
+      legacy.version(version).stores({
+        sessions: 'id, updatedAt, status',
+        records: 'id, sessionId, [sessionId+order], [sessionId+code+address]',
+        settings: 'id',
+        history: 'id, sessionId, [sessionId+timestamp]',
+      });
+      const { cameraCapture: _capture, ...settings } =
+        structuredClone(defaultSettings);
+      expect(_capture).toBe('button');
+      settings.rules.productPatterns = ['^MPC[A-Z0-9]+$'];
+      await legacy.table('settings').put(settings);
+      legacy.close();
+      const updated = new InventoryDatabase(name);
+      try {
+        await updated.open();
+        expect(await updated.settings.get('main')).toEqual({
+          ...settings,
+          cameraCapture: 'button',
+        });
+      } finally {
+        await updated.delete();
+      }
+    },
+  );
   it.each([
     {
       name: 'original IT default',
@@ -65,7 +94,9 @@ describe('upgrade from the published database v1', () => {
         order: 1,
         source: 'hid',
       };
-      await legacy.table('settings').put(settings);
+      const { cameraCapture: _capture, ...oldSettings } = settings;
+      expect(_capture).toBe('button');
+      await legacy.table('settings').put(oldSettings);
       await legacy.table('sessions').put(session);
       await legacy.table('records').put(record);
       legacy.close();
@@ -73,7 +104,7 @@ describe('upgrade from the published database v1', () => {
       const updated = new InventoryDatabase(name);
       try {
         await updated.open();
-        expect(updated.verno).toBe(3);
+        expect(updated.verno).toBe(4);
         expect(await updated.sessions.get(session.id)).toEqual(session);
         expect(await updated.records.get(record.id)).toEqual(record);
         const saved = (await updated.settings.get('main'))!;

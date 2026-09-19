@@ -64,6 +64,200 @@ async function noOverflow(page: Page) {
   ).toBe(true);
 }
 
+test('button capture, actual reticle crop, continuous option, cancellation and offline preference', async ({
+  page,
+  context,
+}) => {
+  await create(page, 'Captura protegida');
+  await readyOffline(page);
+  await hid(page, 'R01A1C02DP01');
+  await page.getByRole('button', { name: 'Câmera', exact: true }).click();
+  await expect(page.getByLabel('Captura pela câmera')).toHaveValue('button');
+  await page.evaluate(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 640;
+    canvas.height = 480;
+    const ctx = canvas.getContext('2d')!;
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, 640, 480);
+    // Canvas streams emit fresh frames only when painted, like a live camera.
+    setInterval(() => ctx.fillRect(0, 0, 1, 1), 100);
+    (window as unknown as { testCamera: HTMLCanvasElement }).testCamera =
+      canvas;
+    navigator.mediaDevices.getUserMedia = async () => canvas.captureStream(8);
+    navigator.mediaDevices.enumerateDevices = async () => [];
+  });
+  const frame = async (
+    labels: { name: string; x: number; y: number; size: number }[],
+  ) => {
+    await page.evaluate(
+      async (labels) => {
+        const canvas = (window as unknown as { testCamera: HTMLCanvasElement })
+          .testCamera;
+        const ctx = canvas.getContext('2d')!;
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, 640, 480);
+        for (const label of labels) {
+          const image = new Image();
+          image.src = label.url;
+          await image.decode();
+          ctx.drawImage(image, label.x, label.y, label.size, label.size);
+        }
+      },
+      await Promise.all(
+        labels.map(async (l) => ({
+          ...l,
+          url: `data:image/png;base64,${(await readFile(`tests/fixtures/${l.name}.png`)).toString('base64')}`,
+        })),
+      ),
+    );
+  };
+  await page
+    .getByRole('button', { name: 'Iniciar câmera', exact: true })
+    .click();
+  await expect(
+    page.getByRole('button', { name: 'Ler código', exact: true }),
+  ).toBeVisible();
+  await frame([{ name: 'product-ml', x: 240, y: 160, size: 160 }]);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByLabel('Captura pela câmera').focus();
+  await page.screenshot({
+    path: '.impeccable/review/button-mobile.png',
+    fullPage: true,
+  });
+  await page.waitForTimeout(1200);
+  await expect(page.locator('.session-heading p')).toContainText('0 registros');
+  await page.getByRole('button', { name: 'Ler código', exact: true }).click();
+  await expect(page.locator('.session-heading p')).toContainText('1 registros');
+  await frame([{ name: 'product-mpc', x: 240, y: 160, size: 160 }]);
+  await page.waitForTimeout(1200);
+  await expect(page.locator('.session-heading p')).toContainText('1 registros');
+  await frame([]);
+  await page.getByRole('button', { name: 'Ler código', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Cancelar leitura', exact: true })
+    .click();
+  await frame([{ name: 'product-mpc', x: 240, y: 160, size: 160 }]);
+  await page.waitForTimeout(600);
+  await expect(page.locator('.session-heading p')).toContainText('1 registros');
+  // A full label outside the reticle and a partial label crossing its left edge.
+  await frame([{ name: 'product-mpc', x: 0, y: 160, size: 80 }]);
+  await page.getByRole('button', { name: 'Ler código', exact: true }).click();
+  await expect(page.locator('.scanner-hint')).toContainText('Tempo esgotado', {
+    timeout: 8000,
+  });
+  await expect(page.locator('.session-heading p')).toContainText('1 registros');
+  await page.getByLabel('Captura pela câmera').selectOption('continuous');
+  await expect(
+    page.getByRole('button', { name: 'Ler código', exact: true }),
+  ).toHaveCount(0);
+  await frame([{ name: 'product-mpc', x: 20, y: 160, size: 160 }]);
+  await page.waitForTimeout(1200);
+  await expect(page.locator('.session-heading p')).toContainText('1 registros');
+  await frame([
+    { name: 'product-mpc', x: 150, y: 160, size: 150 },
+    { name: 'product-stc', x: 330, y: 160, size: 150 },
+  ]);
+  await expect(page.locator('.scanner-hint')).toContainText('várias etiquetas');
+  await expect(page.locator('.session-heading p')).toContainText('1 registros');
+  await frame([{ name: 'product-mpc', x: 240, y: 160, size: 160 }]);
+  await expect(page.locator('.session-heading p')).toContainText('2 registros');
+  await page.waitForTimeout(1200);
+  await expect(
+    page.getByRole('button', { name: 'Adicionar novamente' }),
+  ).toHaveCount(0);
+  for (const [width, height] of [
+    [390, 844],
+    [1366, 900],
+  ]) {
+    await page.setViewportSize({ width, height });
+    await expect
+      .poll(async () => {
+        const video = await page.locator('video').boundingBox();
+        const reticle = await page.locator('.scan-reticle').boundingBox();
+        return Math.abs(
+          video!.x + video!.width / 2 - reticle!.x - reticle!.width / 2,
+        );
+      })
+      .toBeLessThan(2);
+    await page.getByLabel('Captura pela câmera').focus();
+    await noOverflow(page);
+    await page.screenshot({
+      path: `.impeccable/review/capture-${width}.png`,
+      fullPage: true,
+    });
+  }
+  // Camera address change interrupts capture; cancellation preserves the old association.
+  await frame([{ name: 'address2', x: 240, y: 160, size: 160 }]);
+  await expect(
+    page.getByRole('dialog', { name: 'Trocar endereço?' }),
+  ).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({
+    path: '.impeccable/review/address-change-mobile.png',
+    fullPage: true,
+  });
+  await expect(page.locator('.address-value')).toHaveText('R01A1C02DP01');
+  await page
+    .getByRole('button', { name: 'Manter endereço', exact: true })
+    .click();
+  await page.waitForTimeout(1200);
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await frame([]);
+  await page.waitForTimeout(1200);
+  await frame([{ name: 'address2', x: 240, y: 160, size: 160 }]);
+  await page
+    .getByRole('button', { name: 'Confirmar troca', exact: true })
+    .click();
+  await expect(page.locator('.address-value')).toHaveText('R01A1C04DP02');
+  await frame([{ name: 'product-stc', x: 240, y: 160, size: 160 }]);
+  await expect(page.locator('.session-heading p')).toContainText('3 registros');
+  await expect(page.locator('.scan-feedback')).toContainText('STC003');
+  await expect(page.locator('.scan-feedback')).toContainText('R01A1C04DP02');
+  await page.getByRole('button', { name: 'Desfazer', exact: true }).click();
+  await expect(page.locator('.session-heading p')).toContainText('2 registros');
+  await context.setOffline(true);
+  await page.reload();
+  await expect(page.getByLabel('Captura pela câmera')).toHaveValue(
+    'continuous',
+  );
+  await expect(page.locator('.session-heading p')).toContainText('2 registros');
+});
+
+test('address confirmation blocks queued HID scans and double acceptance', async ({
+  page,
+}) => {
+  await create(page, 'Troca de rua');
+  await hid(page, 'R14B77');
+  await page
+    .getByRole('textbox', { name: 'Entrada do leitor' })
+    .evaluate((input) => {
+      for (const value of ['R14B78', 'ML12345']) {
+        (input as HTMLInputElement).value = value;
+        input.dispatchEvent(
+          new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }),
+        );
+      }
+    });
+  await expect(
+    page.getByRole('dialog', { name: 'Trocar endereço?' }),
+  ).toBeVisible();
+  await expect(page.locator('.session-heading p')).toContainText('0 registros');
+  await page.getByRole('button', { name: 'Manter endereço' }).click();
+  await expect(page.locator('.address-value')).toHaveText('R14B77');
+  await hid(page, 'ML12345');
+  await hid(page, 'R14B78');
+  await page
+    .getByRole('button', { name: 'Confirmar troca' })
+    .evaluate((button) => {
+      button.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      button.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(page.locator('.address-value')).toHaveText('R14B78');
+  await expect(page.locator('.session-heading p')).toContainText('1 registros');
+});
+
 test('multiple product prefixes work through Data Matrix, HID, manual entry and XLSX offline', async ({
   page,
   context,
@@ -80,6 +274,9 @@ test('multiple product prefixes work through Data Matrix, HID, manual entry and 
     );
   }
   await hid(page, 'R01A1C04DP03');
+  await page
+    .getByRole('button', { name: 'Confirmar troca', exact: true })
+    .click();
   await hid(page, 'zx123');
   await expect(page.locator('.session-heading p')).toContainText('5 registros');
   await expect(page.locator('.address-value')).toHaveText('R01A1C04DP03');
@@ -177,6 +374,9 @@ test('acceptance: Data Matrix images, browser restart, offline WASM and actual X
       '2 registros',
     );
     await imageScan(page, 'address2');
+    await page
+      .getByRole('button', { name: 'Confirmar troca', exact: true })
+      .click();
     await expect(page.locator('.address-value')).toHaveText('R01A1C04DP02');
     await imageScan(page, 'product3');
     await expect(page.locator('.session-heading p')).toContainText(
@@ -197,6 +397,9 @@ test('acceptance: Data Matrix images, browser restart, offline WASM and actual X
     );
     await expect(page.locator('.address-value')).toHaveText('R01A1C04DP02');
     await imageScan(page, 'address');
+    await page
+      .getByRole('button', { name: 'Confirmar troca', exact: true })
+      .click();
     await expect(page.locator('.address-value')).toHaveText('R01A1C03DP02');
     const filename = await exportXlsx(page);
     const workbook = new ExcelJS.Workbook();
@@ -289,6 +492,9 @@ test('HID, duplicate controls, paired order, batch edits, session actions and ba
     page.getByText('Aguardando endereço', { exact: true }),
   ).toBeVisible();
   await hid(page, 'R14B77');
+  await page
+    .getByRole('button', { name: 'Confirmar troca', exact: true })
+    .click();
   await expect(page.locator('.session-heading p')).toContainText('3 registros');
   await page.getByRole('button', { name: 'Registros 3', exact: true }).click();
   await page.getByLabel('Selecionar registros desta página').check();
@@ -360,6 +566,7 @@ test('synthetic camera decodes Data Matrix once while continuously visible and r
     await create(page, 'Câmera sintética');
     await hid(page, 'R01A1C03DP02');
     await page.getByRole('button', { name: 'Câmera', exact: true }).click();
+    await page.getByLabel('Captura pela câmera').selectOption('continuous');
     await page
       .getByRole('button', { name: 'Iniciar câmera', exact: true })
       .click();

@@ -910,6 +910,24 @@
     gap: 10px;
     margin-top: 14px;
   }
+  .camera-capture-select {
+    margin-block: 14px;
+  }
+  .capture-button {
+    width: 100%;
+    min-height: 52px;
+    margin-top: 14px;
+  }
+  .address-change-codes {
+    display: grid;
+    gap: 16px;
+    margin-block: 20px;
+  }
+  .address-change-codes code {
+    display: block;
+    font-size: 20px;
+    overflow-wrap: anywhere;
+  }
   .camera-controls > button:first-child {
     flex: 1;
     min-height: 50px;

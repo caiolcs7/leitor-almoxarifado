@@ -26,6 +26,7 @@ import {
   processScan,
   type DuplicateCandidate,
   type ScanResult,
+  type AddressChangeCandidate,
 } from '../../core/scan-engine';
 import { statistics } from '../../core/statistics';
 import {
@@ -61,13 +62,20 @@ export function SessionPage({
     [finishing, setFinishing] = useState(false),
     [last, setLast] = useState<ScanResult | null>(null),
     [duplicate, setDuplicate] = useState<DuplicateCandidate | null>(null),
+    [addressChange, setAddressChange] = useState<AddressChangeCandidate | null>(
+      null,
+    ),
+    [resolvingAddress, setResolvingAddress] = useState(false),
     [resolvingDuplicate, setResolvingDuplicate] = useState(false);
   const pendingDuplicate = useRef<DuplicateCandidate | null>(null),
+    pendingAddress = useRef<AddressChangeCandidate | null>(null),
+    addressLock = useRef(false),
     scanQueue = useRef(Promise.resolve()),
     duplicateLock = useRef(false);
   const notice = useNotice(),
     task = useTask();
-  const blocked = manual || exporting || finishing || !!duplicate;
+  const blocked =
+    manual || exporting || finishing || !!duplicate || !!addressChange;
   function result(scan: ScanResult) {
     setLast(scan);
     feedback(scan.kind, settings);
@@ -75,12 +83,16 @@ export function SessionPage({
       pendingDuplicate.current = scan.duplicate;
       setDuplicate(scan.duplicate);
     }
+    if (scan.addressChange) {
+      pendingAddress.current = scan.addressChange;
+      setAddressChange(scan.addressChange);
+    }
   }
   async function receive(raw: string, source: Source) {
     scanQueue.current = scanQueue.current.then(async () => {
-      if (pendingDuplicate.current) {
+      if (pendingDuplicate.current || pendingAddress.current) {
         notice(
-          'Leitura pausada: resolva o aviso de repetição e leia a próxima etiqueta novamente.',
+          'Leitura pausada: resolva a confirmação e leia a próxima etiqueta novamente.',
         );
         return;
       }
@@ -91,6 +103,35 @@ export function SessionPage({
       }
     });
     await scanQueue.current;
+  }
+  async function resolveAddress(confirm: boolean) {
+    const candidate = pendingAddress.current;
+    if (!candidate || addressLock.current) return;
+    addressLock.current = true;
+    setResolvingAddress(true);
+    try {
+      if (confirm)
+        result(
+          await processScan(
+            id,
+            candidate.raw,
+            candidate.source,
+            settings,
+            candidate,
+          ),
+        );
+      else
+        setLast({
+          kind: 'waiting',
+          message: 'Troca cancelada. Endereço mantido.',
+          value: candidate.from,
+        });
+      pendingAddress.current = null;
+      setAddressChange(null);
+    } finally {
+      addressLock.current = false;
+      setResolvingAddress(false);
+    }
   }
   async function resolveRepeat(add: boolean) {
     const candidate = pendingDuplicate.current;
@@ -300,7 +341,7 @@ export function SessionPage({
                 <select
                   id="session-mode"
                   value={session.mode}
-                  disabled={!!duplicate}
+                  disabled={blocked}
                   onChange={(e) =>
                     void task(() =>
                       updateSession(id, {
@@ -362,7 +403,10 @@ export function SessionPage({
                   {last?.value ? (
                     <code>{last.value}</code>
                   ) : (
-                    <p>Um endereço. Vários produtos. Sem confirmações.</p>
+                    <p>Leia o endereço e, depois, os produtos desta posição.</p>
+                  )}
+                  {last?.record && (
+                    <span className="mono">{last.record.address}</span>
                   )}
                 </div>
               </div>
@@ -396,7 +440,7 @@ export function SessionPage({
             />
             <div className="scan-side">
               <div className="quick-actions">
-                <button onClick={() => setManual(true)} disabled={!!duplicate}>
+                <button onClick={() => setManual(true)} disabled={blocked}>
                   <PencilLine />
                   Entrada manual
                 </button>
@@ -458,6 +502,46 @@ export function SessionPage({
           onResult={result}
         />
       )}{' '}
+      {addressChange && (
+        <Modal
+          title="Trocar endereço?"
+          onClose={() => {
+            if (!addressLock.current) void task(() => resolveAddress(false));
+          }}
+        >
+          <p>
+            As leituras estão pausadas. Confirme a posição antes de continuar.
+          </p>
+          <div className="address-change-codes">
+            <div>
+              <span>Endereço atual</span>
+              <code>{addressChange.from}</code>
+            </div>
+            <div>
+              <span>Novo endereço</span>
+              <code>{addressChange.to}</code>
+            </div>
+          </div>
+          <p className="helper">
+            Os registros já salvos mantêm seus endereços.
+          </p>
+          <div className="modal-actions wrap">
+            <button
+              disabled={resolvingAddress}
+              onClick={() => void task(() => resolveAddress(false))}
+            >
+              Manter endereço
+            </button>
+            <button
+              className="primary"
+              disabled={resolvingAddress}
+              onClick={() => void task(() => resolveAddress(true))}
+            >
+              {resolvingAddress ? 'Salvando…' : 'Confirmar troca'}
+            </button>
+          </div>
+        </Modal>
+      )}
       {exporting && (
         <ExportDialog
           session={session}

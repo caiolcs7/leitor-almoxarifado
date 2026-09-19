@@ -1,6 +1,8 @@
 import { ScanGate } from '../core/scan-gate';
 import { cleanText } from '../core/parser';
 import { LocalDecoder, type Decoded } from './decoder';
+import { cameraRegion } from '../core/camera-region';
+import type { Settings } from '../core/models';
 
 type CameraCapabilities = MediaTrackCapabilities & {
   torch?: boolean;
@@ -23,11 +25,18 @@ export type CameraState = {
   torch: boolean;
   zoom?: { min: number; max: number; step: number };
   devices: MediaDeviceInfo[];
+  armed?: boolean;
+  region?: ReturnType<typeof cameraRegion>;
 };
 export class ScannerService {
   private stream: MediaStream | null = null;
   private decoder = new LocalDecoder();
   private gate = new ScanGate();
+  private capture: Settings['cameraCapture'] = 'button';
+  private attempt = 0;
+  private until = 0;
+  private expiry: ReturnType<typeof setTimeout> | undefined;
+  private resizeObserver?: ResizeObserver;
   private generation = 0;
   private timer: ReturnType<typeof setTimeout> | undefined;
   private native: NativeDetector | null = null;
@@ -45,6 +54,38 @@ export class ScannerService {
     private onScan: (raw: string) => Promise<void>,
     private onState: (state: CameraState) => void,
   ) {}
+  setCapture(mode: Settings['cameraCapture']) {
+    this.capture = mode;
+    this.cancelRead();
+  }
+  requestRead() {
+    if (!this.state.running || this.capture !== 'button' || this.until) return;
+    this.attempt++;
+    this.until = Date.now() + 5000;
+    this.publish({
+      armed: true,
+      message: 'Buscando uma etiqueta na mira… Até 5 segundos.',
+    });
+    this.expiry = setTimeout(
+      () =>
+        this.cancelRead(
+          'Tempo esgotado. Enquadre a etiqueta e toque em Ler código.',
+        ),
+      5000,
+    );
+  }
+  cancelRead(message = 'Enquadre a etiqueta e toque em Ler código.') {
+    this.attempt++;
+    this.until = 0;
+    clearTimeout(this.expiry);
+    this.publish({
+      armed: false,
+      message:
+        this.capture === 'continuous'
+          ? 'Leitura contínua: enquadre apenas uma etiqueta na mira.'
+          : message,
+    });
+  }
   async start(video: HTMLVideoElement, cameraId: string, autoTorch = false) {
     this.stop();
     const generation = this.generation;
@@ -73,6 +114,19 @@ export class ScannerService {
       video.srcObject = stream;
       await video.play();
       if (generation !== this.generation) return;
+      if (typeof ResizeObserver !== 'undefined') {
+        this.resizeObserver = new ResizeObserver(() => {
+          this.publish({
+            region: cameraRegion(
+              video.videoWidth,
+              video.videoHeight,
+              video.clientWidth,
+              video.clientHeight,
+            ),
+          });
+        });
+        this.resizeObserver.observe(video);
+      }
       const caps: CameraCapabilities = this.track.getCapabilities?.() ?? {};
       if (caps.focusMode?.includes('continuous'))
         await this.constraint({ focusMode: 'continuous' }).catch(() => {});
@@ -105,7 +159,10 @@ export class ScannerService {
       if (autoTorch && caps.torch) await this.setTorch(true).catch(() => {});
       this.publish({
         running: true,
-        message: 'Aponte para uma etiqueta',
+        message:
+          this.capture === 'continuous'
+            ? 'Leitura contínua: enquadre apenas uma etiqueta na mira.'
+            : 'Enquadre a etiqueta e toque em Ler código.',
         engine: this.native ? 'Detector nativo + ZXing' : 'ZXing-C++',
         torch: !!caps.torch,
         zoom: caps.zoom,
@@ -135,12 +192,37 @@ export class ScannerService {
           this.timer = setTimeout(() => void tick(), 150);
           return;
         }
-        // Preserve enough source detail for the small, dense industrial Data
-        // Matrix labels while bounding CPU use on 4K mobile cameras.
-        const scale = Math.min(1, 1920 / video.videoWidth);
-        canvas.width = Math.round(video.videoWidth * scale);
-        canvas.height = Math.round(video.videoHeight * scale);
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const region = cameraRegion(
+          video.videoWidth,
+          video.videoHeight,
+          video.clientWidth,
+          video.clientHeight,
+        );
+        if (!region) {
+          this.timer = setTimeout(() => void tick(), 160);
+          return;
+        }
+        if (JSON.stringify(region) !== JSON.stringify(this.state.region))
+          this.publish({ region });
+        if (this.capture === 'button' && !this.until) {
+          this.timer = setTimeout(() => void tick(), 160);
+          return;
+        }
+        const attempt = this.attempt;
+        const scale = Math.min(1, 1920 / region.sw);
+        canvas.width = Math.round(region.sw * scale);
+        canvas.height = Math.round(region.sh * scale);
+        ctx.drawImage(
+          video,
+          region.sx,
+          region.sy,
+          region.sw,
+          region.sh,
+          0,
+          0,
+          canvas.width,
+          canvas.height,
+        );
         let values: Decoded[] = [];
         if (this.native) {
           try {
@@ -161,11 +243,41 @@ export class ScannerService {
             ctx.getImageData(0, 0, canvas.width, canvas.height),
           );
         if (generation !== this.generation) return;
+        // A cancelled/expired attempt must never deliver its late decoder result.
+        if (
+          attempt !== this.attempt ||
+          JSON.stringify(region) !==
+            JSON.stringify(
+              cameraRegion(
+                video.videoWidth,
+                video.videoHeight,
+                video.clientWidth,
+                video.clientHeight,
+              ),
+            ) ||
+          (this.capture === 'button' && Date.now() >= this.until)
+        ) {
+          this.timer = setTimeout(() => void tick(), 160);
+          return;
+        }
         const unique = [...new Set(values.map((v) => v.text))];
         if (unique.length === 1) {
           this.missedFrames = 0;
-          if (this.gate.accept(cleanText(unique[0]), Date.now()))
+          if (this.capture === 'button') {
+            this.cancelRead(
+              'Leitura concluída. Toque em Ler código para a próxima etiqueta.',
+            );
             await this.onScan(unique[0]);
+          } else if (this.gate.accept(cleanText(unique[0]), Date.now())) {
+            this.publish({
+              message: 'Etiqueta lida. Aponte para a próxima dentro da mira.',
+            });
+            await this.onScan(unique[0]);
+          } else
+            this.publish({
+              message:
+                'Etiqueta já lida. Aponte para a próxima dentro da mira.',
+            });
         } else if (unique.length > 1) {
           this.publish({
             message: 'Há várias etiquetas na imagem. Enquadre apenas uma.',
@@ -190,6 +302,12 @@ export class ScannerService {
     await tick();
   }
   private publish(change: Partial<CameraState>) {
+    if (
+      Object.entries(change).every(([key, value]) =>
+        Object.is(this.state[key as keyof CameraState], value),
+      )
+    )
+      return;
     this.state = { ...this.state, ...change };
     this.onState(this.state);
   }
@@ -207,10 +325,13 @@ export class ScannerService {
     return this.constraint({ zoom: value });
   }
   stop() {
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = undefined;
+    this.cancelRead();
     this.generation++;
     clearTimeout(this.timer);
     this.decoder.stop();
-    this.gate.reset();
+    // Retain the visible-code latch across confirmation dialogs to avoid re-prompting.
     this.stream?.getTracks().forEach((track) => {
       track.onended = null;
       track.stop();

@@ -9,6 +9,7 @@ import {
   ImagePlus,
   MonitorCheck,
   ShieldCheck,
+  X,
 } from 'lucide-react';
 import type { Settings, Source } from '../../core/models';
 import { ScannerService, type CameraState } from '../../services/scanner';
@@ -16,6 +17,7 @@ import { decodeImage } from '../../services/decoder';
 import { useHid, usePageVisible, useWakeLock } from '../../hooks/useHardware';
 import { errorMessage, useNotice, useTask } from '../../components/ui';
 import { unlockAudio } from '../../services/feedback';
+import { db } from '../../core/database';
 
 export function ScannerPanel({
   settings,
@@ -53,6 +55,9 @@ export function ScannerPanel({
     [],
   );
   const scanning = active && visible && input === 'camera' && !blocked;
+  useEffect(() => {
+    service.setCapture(settings.cameraCapture ?? 'button');
+  }, [service, settings.cameraCapture]);
   useEffect(() => {
     if (scanning && video.current)
       void service.start(video.current, cameraId, settings.autoTorch);
@@ -109,6 +114,22 @@ export function ScannerPanel({
       </div>
       {input === 'camera' ? (
         <>
+          <label className="camera-capture-select">
+            Captura pela câmera
+            <select
+              value={settings.cameraCapture ?? 'button'}
+              disabled={blocked}
+              onChange={(e) => {
+                const cameraCapture = e.target
+                  .value as Settings['cameraCapture'];
+                service.setCapture(cameraCapture);
+                void task(() => db.settings.update('main', { cameraCapture }));
+              }}
+            >
+              <option value="button">Por botão · uma etiqueta por toque</option>
+              <option value="continuous">Contínua · sem botão</option>
+            </select>
+          </label>
           <div className={`camera-view ${camera.running ? 'running' : ''}`}>
             <video
               ref={video}
@@ -128,7 +149,22 @@ export function ScannerPanel({
                   <span>Data Matrix, QR Code e códigos industriais</span>
                 </div>
               )}
-              <div className="scan-reticle" aria-hidden="true">
+              <div
+                className="scan-reticle"
+                aria-hidden="true"
+                style={
+                  camera.running && camera.region
+                    ? {
+                        position: 'absolute',
+                        left: camera.region.left,
+                        top: camera.region.top,
+                        width: camera.region.width,
+                        height: camera.region.height,
+                        maxHeight: 'none',
+                      }
+                    : undefined
+                }
+              >
                 <i />
                 <i />
                 <i />
@@ -137,11 +173,29 @@ export function ScannerPanel({
               {camera.running && (
                 <span className="camera-live">
                   <span />
-                  Câmera ativa
+                  {settings.cameraCapture === 'continuous'
+                    ? 'Leitura contínua'
+                    : camera.armed
+                      ? 'Buscando etiqueta'
+                      : 'Aguardando seu toque'}
                 </span>
               )}
             </div>
           </div>
+          {camera.running && settings.cameraCapture !== 'continuous' && (
+            <button
+              className="primary capture-button"
+              disabled={blocked}
+              onClick={() => {
+                unlockAudio();
+                if (camera.armed) service.cancelRead();
+                else service.requestRead();
+              }}
+            >
+              {camera.armed ? <X /> : <ScanLine />}
+              {camera.armed ? 'Cancelar leitura' : 'Ler código'}
+            </button>
+          )}
           <div className="camera-controls">
             <button
               className={camera.running ? '' : 'primary'}
@@ -223,6 +277,9 @@ export function ScannerPanel({
           )}
           <p className="scanner-hint" role="status">
             {imageBusy ? 'Lendo imagem localmente…' : camera.message}
+          </p>
+          <p className="helper">
+            Somente etiquetas inteiras dentro da mira são lidas.
           </p>
         </>
       ) : (

@@ -60,7 +60,9 @@ npm run preview -- --base=/nome-do-repositorio/
 
 ## Operação
 
-Crie um levantamento, inicie a câmera e leia um endereço. Cada produto seguinte é salvo imediatamente nesse endereço. Leia outro endereço para mudar de posição. O modo pareado permite produto → endereço ou endereço → produto. O estado do par e o endereço atual sobrevivem ao fechamento do navegador.
+Crie um levantamento e inicie a câmera. Em **Captura pela câmera**, o padrão é **Por botão**: enquadre a etiqueta inteira na mira e toque em **Ler código**. Cada toque permite uma única leitura, com até 5 segundos de busca e opção de cancelar. Para ler automaticamente, selecione **Contínua · sem botão**; a preferência fica salva neste dispositivo. Nos dois modos, somente a área dentro da mira é enviada ao decodificador.
+
+Leia primeiro um endereço. Cada produto seguinte é salvo nele. Ao ler uma posição diferente, escolha **Confirmar troca** ou **Manter endereço**; nenhuma leitura adicional é aceita durante essa decisão, e registros anteriores mantêm seus endereços. O modo pareado permite produto → endereço ou endereço → produto, também com confirmação quando a posição muda. O código e o endereço registrados aparecem no feedback; **Desfazer** remove o último registro e permite restaurá-lo. O estado do par e o endereço atual sobrevivem ao fechamento do navegador.
 
 Também há leitor físico (teclado com Enter/Tab), leitura de uma imagem por vez e entrada manual. A entrada manual já recebe o último endereço lido e permite registrar **SEM CODIGO** ou **VAZIO** sem digitar um código. Em Registros, use busca, filtros, revisão, edição, seleção e alteração de endereço em lote. `Ctrl+Z` desfaz, `Ctrl+F` abre a busca e `Ctrl+E` exporta; atalhos não interferem com campos de texto. Esc fecha diálogos.
 

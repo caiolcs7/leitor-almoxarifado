@@ -40,7 +40,7 @@ Confirmed on 2026-09-14: products use varied prefixes, including IT, ITCP, MPC a
 
 ## Product Principles
 
-Correct association before automation. Fast repeated operations. Local processing. Recoverable changes. Honest validation evidence.
+Camera capture defaults to one reading per button press (5-second timeout); continuous capture remains an explicit persisted option. Both use the actual reticle crop. Changing the active address requires confirmation in fixed and paired modes. Correct association before automation. Fast repeated operations. Local processing. Recoverable changes. Honest validation evidence.
 
 ## Accessibility & Inclusion
 

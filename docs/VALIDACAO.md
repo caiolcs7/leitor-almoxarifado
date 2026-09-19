@@ -1,13 +1,13 @@
 # Validação da entrega
 
-Execução em 12–14/09/2026, Windows/Linux, Node.js 24.19.0, Chromium automatizado pelo Playwright 1.63.0. Os resultados abaixo descrevem testes executados; emulação de tela e câmera sintética não equivalem a homologação em celulares físicos.
+Execução local em 12–19/09/2026, Windows, Node.js 24.19.0, Chromium automatizado pelo Playwright 1.63.0. Os resultados abaixo descrevem testes executados; emulação de tela e câmera sintética não equivalem a homologação em celulares físicos.
 
 ## Resultado técnico
 
 | Verificação            | Resultado                                                                |
 | ---------------------- | ------------------------------------------------------------------------ |
-| `npm run test`         | 101 testes aprovados em 6 arquivos                                       |
-| `npm run test:e2e`     | 9 cenários de navegador                                                  |
+| `npm run test`         | 119 testes aprovados em 7 arquivos                                       |
+| `npm run test:e2e`     | 11 cenários aprovados                                                    |
 | `npm run lint`         | Aprovado, sem erros ou avisos                                            |
 | `npm run typecheck`    | Aprovado; também executado no build                                      |
 | `npm run build`        | Aprovado; manifest, service worker, worker e WASM gerados                |
@@ -30,11 +30,17 @@ O endereço ativo e todos os registros foram recuperados. Ainda offline, outra i
 
 O mesmo cenário verificou edição e exclusão offline, recarga, desfazer e restaurar. O teste espera a confirmação de salvamento antes de encerrar ou recarregar a página.
 
+## Proteção contra leituras acidentais
+
+Captura por botão como padrão, uma leitura por toque, cancelamento e prazo de 5 segundos. Testes unitários cobrem resultados atrasados após cancelar, expirar, pausar, mudar o modo ou redimensionar a tela, incluindo o caminho do detector nativo. Um teste com vídeo sintético mutável e Data Matrix reais de teste verifica ausência de gravações antes do toque, etiquetas fora da mira, etiqueta parcial na borda, múltiplas etiquetas, leitura contínua sem botão, confirmação/cancelamento da troca de endereço, desfazer e persistência da preferência offline. A geometria da mira é conferida em telas com diferentes proporções.
+
+As migrações preservam preferências e regras existentes e ativam o modo por botão quando ausente. Backups novos preservam a opção contínua; os antigos recebem o padrão por botão. A fila HID bloqueia leituras durante a confirmação e cliques duplos não duplicam a operação. A mudança de endereço nos dois modos pareados também tem teste transacional.
+
 ## Cobertura de leitura e dados
 
 A atualização de 14/09 foi validada contra recortes das etiquetas reais fornecidas: o decoder extraiu `251MPC149M050P6<GS>371`, `251ITCP001M0016A<GS>371` e `A1;R02A1C01EP02`; o parser produziu respectivamente `MPC149M050P6`, `ITCP001M0016A` e `R02A1C01EP02`. Casos HRI equivalentes para MPC, STPC e ITCP também possuem regressão automatizada. O cenário de navegador confirma que o endereço lido preenche a entrada manual e que `SEM CODIGO` e `VAZIO` são persistidos como registros explícitos.
 
-Dois testes de migração abriram um banco v1 com dados existentes e verificaram atualização para v3, preservando registros, endereço ativo, par pendente, preferências e regras personalizadas. Um teste adicional restaurou configurações de backup antigo e confirmou que a restrição a IT não voltou.
+Dois testes de migração abriram um banco v1 com dados existentes e verificaram atualização para v4, preservando registros, endereço ativo, par pendente, preferências e regras personalizadas. Um teste adicional restaurou configurações de backup antigo e confirmou que a restrição a IT não voltou.
 
 - Data Matrix normal, rotacionado e invertido, incluindo os formatos de endereço complexo e bombona; QR Code e Code 128 também decodificados em testes próprios.
 - Imagem sem código rejeitada; controles, espaços, Unicode, identificadores AIM, wrappers completos e ambiguidade exercitados no parser.

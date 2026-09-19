@@ -11,11 +11,27 @@ export type DuplicateCandidate = {
   paired: boolean;
 };
 export type ScanResult = {
-  kind: 'address' | 'product' | 'waiting' | 'error' | 'duplicate';
+  kind:
+    | 'address'
+    | 'product'
+    | 'waiting'
+    | 'error'
+    | 'duplicate'
+    | 'address-change';
   message: string;
   value?: string;
   record?: InventoryRecord;
   duplicate?: DuplicateCandidate;
+  addressChange?: AddressChangeCandidate;
+};
+export type AddressChangeCandidate = {
+  sessionId: string;
+  raw: string;
+  source: Source;
+  from: string;
+  to: string;
+  mode: Session['mode'];
+  pending: Session['pending'];
 };
 export function pairTransition(
   session: Session,
@@ -121,11 +137,22 @@ export async function processScan(
   raw: string,
   source: Source,
   settings: Settings,
+  approvedChange?: AddressChangeCandidate,
 ): Promise<ScanResult> {
   return db.transaction('rw', db.sessions, db.records, db.history, async () => {
     const session = await db.sessions.get(sessionId);
     if (!session || session.status === 'archived')
       throw new Error('Levantamento indisponível.');
+    if (
+      approvedChange &&
+      (approvedChange.from !== session.activeAddress ||
+        approvedChange.mode !== session.mode ||
+        JSON.stringify(approvedChange.pending) !==
+          JSON.stringify(session.pending))
+    )
+      throw new Error(
+        'O levantamento mudou durante a confirmação. Cancele e leia o endereço novamente.',
+      );
     const scan = parseScan(raw, settings.rules);
     let result: ScanResult;
     if (!scan.valid || scan.type === 'unknown')
@@ -140,7 +167,29 @@ export async function processScan(
       );
       if (transition.error)
         result = { kind: 'error', message: transition.error };
-      else if (transition.address) {
+      else if (
+        scan.type === 'address' &&
+        session.activeAddress &&
+        session.activeAddress !== scan.normalized &&
+        !(
+          approvedChange?.to === scan.normalized &&
+          approvedChange.sessionId === sessionId
+        )
+      ) {
+        result = {
+          kind: 'address-change',
+          message: 'Confirme a troca de endereço para continuar.',
+          addressChange: {
+            sessionId,
+            raw,
+            source,
+            from: session.activeAddress,
+            to: scan.normalized,
+            mode: session.mode,
+            pending: session.pending,
+          },
+        };
+      } else if (transition.address) {
         await db.sessions.update(sessionId, {
           activeAddress: transition.address,
           updatedAt: Date.now(),
