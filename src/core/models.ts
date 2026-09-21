@@ -51,7 +51,68 @@ export const defaultSettings: Settings = {
     addressPatterns: [
       // Keep the standard C/DP or C/EP locations valid while also accepting
       // alternative location blocks such as R07A1GHBEG01 and R07A1AVFEG01.
-      '^R[0-9]{2,3}A[0-9]{1,3}[A-Z0-9]+$',
+      '^R[0-9]{2,3}A[0-9]{1,3}[A-Z0-9]{1,122},
+      '^R[0-9]{2,3}B[0-9]{1,3}$',
+    ],
+    padB: false,
+    wrappers: [],
+  },
+};
+export const sourceSchema = z.enum(['camera', 'hid', 'image', 'manual']);
+export type Source = z.infer<typeof sourceSchema>;
+const code = z.string().min(1).max(128);
+export const sessionSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().trim().min(1).max(100),
+  createdAt: z.number().finite(),
+  updatedAt: z.number().finite(),
+  status: z.enum(['active', 'completed', 'archived']),
+  notes: z.string().max(2000),
+  count: z.number().int().nonnegative(),
+  nextOrder: z.number().int().positive(),
+  activeAddress: z.string().max(128),
+  mode: z.enum(['fixed', 'product-address', 'address-product']),
+  pending: z
+    .object({
+      type: z.enum(['product', 'address']),
+      value: code,
+      raw: z.string().max(2048).optional(),
+      source: sourceSchema,
+    })
+    .nullable(),
+  completedAddresses: z.array(code).max(100000),
+});
+export type Session = z.infer<typeof sessionSchema>;
+export const recordSchema = z.object({
+  id: z.string().uuid(),
+  sessionId: z.string().uuid(),
+  code,
+  address: code,
+  timestamp: z.number().finite(),
+  order: z.number().int().positive(),
+  source: sourceSchema,
+  rawScan: z.string().max(2048).optional(),
+});
+export type InventoryRecord = z.infer<typeof recordSchema>;
+export const historySchema = z.object({
+  id: z.string().uuid(),
+  sessionId: z.string().uuid(),
+  timestamp: z.number().finite(),
+  normalized: z.string().max(128),
+  raw: z.string().max(2048).optional(),
+  source: sourceSchema,
+  outcome: z.string().max(240),
+});
+export type ScanHistory = z.infer<typeof historySchema>;
+export type ParsedScan = {
+  raw: string;
+  normalized: string;
+  type: 'product' | 'address' | 'unknown';
+  valid: boolean;
+  warnings: string[];
+  error?: string;
+};
+,
       '^R[0-9]{2,3}B[0-9]{1,3}$',
     ],
     padB: false,
