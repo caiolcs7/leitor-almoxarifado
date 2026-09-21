@@ -78,8 +78,24 @@ function unwrapGs1(raw: string): string | null {
     : null;
   return compact ? cleanText(compact[1]) : null;
 }
+function isWarehouseAddress(value: string): boolean {
+  // Physical location labels use R + street + A + floor, followed by an
+  // alphanumeric location block. This recognizes labels such as:
+  // R06A1C06DP01, R07A1GHBEG01 and R07A1AVFEG01 independently of
+  // address rules persisted by older app versions.
+  return (
+    /^R[0-9]{2,3}A[0-9]{1,3}[A-Z0-9]{1,120}$/.test(value) ||
+    /^R[0-9]{2,3}B[0-9]{1,3}$/.test(value)
+  );
+}
+function matchesAddress(value: string, rules: Rules): boolean {
+  return (
+    isWarehouseAddress(value) ||
+    rules.addressPatterns.some((p) => new RegExp(p).test(value))
+  );
+}
 function classify(value: string, rules: Rules): ParsedScan['type'] {
-  const address = rules.addressPatterns.some((p) => new RegExp(p).test(value));
+  const address = matchesAddress(value, rules);
   const product = rules.productPatterns.some((p) => new RegExp(p).test(value));
   // Location rules are intentionally more specific than the unrestricted
   // product rule. A complete warehouse address therefore always wins.
@@ -88,9 +104,7 @@ function classify(value: string, rules: Rules): ParsedScan['type'] {
 function normalizeStructuredAddress(raw: string, rules: Rules): string | null {
   const compact = cleanText(raw).replace(/[^A-Z0-9]/g, '');
   if (!/^R[0-9]{2,3}/.test(compact)) return null;
-  return rules.addressPatterns.some((p) => new RegExp(p).test(compact))
-    ? compact
-    : null;
+  return matchesAddress(compact, rules) ? compact : null;
 }
 
 export function parseScan(raw: string, rules: Rules): ParsedScan {
@@ -122,7 +136,7 @@ export function parseScan(raw: string, rules: Rules): ParsedScan {
   const addressEnvelope = /^[^;]{1,20};(.+)$/.exec(normalized);
   if (
     addressEnvelope &&
-    rules.addressPatterns.some((p) => new RegExp(p).test(addressEnvelope[1]))
+    matchesAddress(addressEnvelope[1], rules)
   ) {
     normalized = addressEnvelope[1];
     warnings.push('Prefixo da etiqueta de endereço removido.');
