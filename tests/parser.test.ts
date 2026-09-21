@@ -61,6 +61,17 @@ describe('central parser', () => {
         normalized: value,
       }),
   );
+  it.each([
+    'R07A1;GHBEG01',
+    'R07-A1-GHB-E-G01',
+    'R07 A1 GHB E G01',
+  ])('normalizes separated address labels: %s', (value) =>
+    expect(parseScan(value, rules)).toMatchObject({
+      valid: true,
+      type: 'address',
+      normalized: 'R07A1GHBEG01',
+    }),
+  );
   it('removes the site prefix encoded before a complete address', () =>
     expect(parseScan('A1;R02A1C01EP02', rules)).toMatchObject({
       valid: true,

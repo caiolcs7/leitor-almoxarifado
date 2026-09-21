@@ -85,6 +85,14 @@ function classify(value: string, rules: Rules): ParsedScan['type'] {
   // product rule. A complete warehouse address therefore always wins.
   return address ? 'address' : product ? 'product' : 'unknown';
 }
+function normalizeStructuredAddress(raw: string, rules: Rules): string | null {
+  const compact = cleanText(raw).replace(/[^A-Z0-9]/g, '');
+  if (!/^R[0-9]{2,3}/.test(compact)) return null;
+  return rules.addressPatterns.some((p) => new RegExp(p).test(compact))
+    ? compact
+    : null;
+}
+
 export function parseScan(raw: string, rules: Rules): ParsedScan {
   const invalid = (normalized: string, error: string): ParsedScan => ({
     raw,
@@ -103,8 +111,11 @@ export function parseScan(raw: string, rules: Rules): ParsedScan {
   }
   const warnings: string[] = [];
   const gs1Payload = unwrapGs1(raw);
-  let normalized = gs1Payload ?? cleanText(raw);
+  const structuredAddress = gs1Payload ? null : normalizeStructuredAddress(raw, rules);
+  let normalized = gs1Payload ?? structuredAddress ?? cleanText(raw);
   if (gs1Payload) warnings.push('Identificadores GS1 removidos.');
+  else if (structuredAddress && structuredAddress !== cleanText(raw))
+    warnings.push('Separadores da etiqueta de endereço removidos.');
 
   // Address labels include the warehouse/site prefix before a semicolon,
   // for example A1;R02A1C01EP02. Keep only the structured location payload.
