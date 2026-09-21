@@ -71,7 +71,7 @@ describe('intentional camera capture', () => {
     service.requestRead();
     await vi.advanceTimersByTimeAsync(300);
     expect(detect).toHaveBeenCalledTimes(1);
-    expect(detect.mock.calls[0][0]).toMatchObject({ width: 550, height: 374 });
+    expect(detect.mock.calls[0][0]).toMatchObject({ width: 460, height: 288 });
     expect(scan).toHaveBeenCalledWith('MPL012');
     expect(mocks.decode).not.toHaveBeenCalled();
   });
@@ -87,7 +87,7 @@ describe('intentional camera capture', () => {
     service.requestRead();
     await vi.advanceTimersByTimeAsync(200);
     expect(scan).toHaveBeenCalledTimes(2);
-    expect(draw.mock.calls[0].slice(1, 5)).toEqual([45, 53, 550, 374]);
+    expect(draw.mock.calls[0].slice(1, 5)).toEqual([90, 96, 460, 288]);
   });
   it.each(['cancel', 'timeout', 'stop', 'mode'] as const)(
     'discards late decoder results after %s',
