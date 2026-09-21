@@ -141,7 +141,9 @@ test('button capture, actual reticle crop, continuous option, cancellation and o
   await page.waitForTimeout(600);
   await expect(page.locator('.session-heading p')).toContainText('1 registros');
   // A full label outside the reticle and a partial label crossing its left edge.
-  await frame([{ name: 'product-mpc', x: 0, y: 160, size: 80 }]);
+  await frame([{ name: 'product-mpc', x: 0, y: 170, size: 40 }]);
+  // Let the synthetic camera publish the new blank/out-of-reticle frame before arming.
+  await page.waitForTimeout(600);
   await page.getByRole('button', { name: 'Ler código', exact: true }).click();
   await expect(page.locator('.scanner-hint')).toContainText('Tempo esgotado', {
     timeout: 8000,
