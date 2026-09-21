@@ -104,7 +104,7 @@ describe('upgrade from the published database v1', () => {
       const updated = new InventoryDatabase(name);
       try {
         await updated.open();
-        expect(updated.verno).toBe(4);
+        expect(updated.verno).toBe(5);
         expect(await updated.sessions.get(session.id)).toEqual(session);
         expect(await updated.records.get(record.id)).toEqual(record);
         const saved = (await updated.settings.get('main'))!;
@@ -128,4 +128,42 @@ describe('upgrade from the published database v1', () => {
       }
     },
   );
+
+  it('upgrades a v4 database with the published address defaults to the expanded address family', async () => {
+    const name = `migration-v5-${crypto.randomUUID()}`;
+    const legacy = new Dexie(name);
+    legacy.version(4).stores({
+      sessions: 'id, updatedAt, status',
+      records: 'id, sessionId, [sessionId+order], [sessionId+code+address]',
+      settings: 'id',
+      history: 'id, sessionId, [sessionId+timestamp]',
+    });
+    const settings = structuredClone(defaultSettings);
+    settings.rules.addressPatterns = [
+      '^R[0-9]{2,3}A[0-9]{1,3}C[0-9]{1,3}DP[0-9]{1,3}$',
+      '^R[0-9]{2,3}B[0-9]{1,3}$',
+    ];
+    await legacy.table('settings').put(settings);
+    legacy.close();
+
+    const updated = new InventoryDatabase(name);
+    try {
+      await updated.open();
+      expect(updated.verno).toBe(5);
+      const saved = (await updated.settings.get('main'))!;
+      expect(saved.rules.addressPatterns).toEqual(defaultSettings.rules.addressPatterns);
+      expect(parseScan('R07A1GHBEG01', saved.rules)).toMatchObject({
+        valid: true,
+        type: 'address',
+        normalized: 'R07A1GHBEG01',
+      });
+      expect(parseScan('R07A1AVFEG01', saved.rules)).toMatchObject({
+        valid: true,
+        type: 'address',
+        normalized: 'R07A1AVFEG01',
+      });
+    } finally {
+      await updated.delete();
+    }
+  });
 });

@@ -43,6 +43,13 @@ export class InventoryDatabase extends Dexie {
         if (settings && !settings.cameraCapture)
           await table.put({ ...settings, cameraCapture: 'button' });
       });
+    this.version(5)
+      .stores({})
+      .upgrade(async (transaction) => {
+        const table = transaction.table<Settings, string>('settings');
+        const settings = await table.get('main');
+        if (settings) await table.put(upgradeLegacySettings(settings));
+      });
   }
 }
 export const db = new InventoryDatabase();

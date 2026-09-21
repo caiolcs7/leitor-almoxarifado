@@ -44,7 +44,15 @@ describe('central parser', () => {
     expect(parseScan(' Ml12345\r\n', rules).normalized).toBe('ML12345');
     expect(parseScan('Mi12345', rules).normalized).toBe('MI12345');
   });
-  it.each(['R01A1C02DP01', 'R01A1C04DP03', 'R01A1C03DP03', 'R02A1C01EP02'])(
+  it.each([
+    'R01A1C02DP01',
+    'R01A1C04DP03',
+    'R01A1C03DP03',
+    'R02A1C01EP02',
+    'R07A1GHBEG01',
+    'R07A1AVFEG01',
+    'R12A10XYZ99',
+  ])(
     'keeps each R address classified as a location: %s',
     (value) =>
       expect(parseScan(value, rules)).toMatchObject({
