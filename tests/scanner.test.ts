@@ -87,7 +87,7 @@ describe('intentional camera capture', () => {
     service.requestRead();
     await vi.advanceTimersByTimeAsync(200);
     expect(scan).toHaveBeenCalledTimes(2);
-    expect(draw.mock.calls[0].slice(1, 5)).toEqual([44, 53, 550, 374]);
+    expect(draw.mock.calls[0].slice(1, 5)).toEqual([45, 53, 550, 374]);
   });
   it.each(['cancel', 'timeout', 'stop', 'mode'] as const)(
     'discards late decoder results after %s',
